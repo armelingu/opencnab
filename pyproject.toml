@@ -1,0 +1,25 @@
+[project]
+name = "opencnab"
+version = "0.1.0"
+description = "Biblioteca Open Source para CNAB 240 e CNAB 400"
+authors = [
+    {name = "Gustavo Armelin"}
+]
+requires-python = ">=3.11"
+
+dependencies = [
+    "pydantic>=2.11.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff"
+]
+
+[tool.pytest.ini_options]
+testpaths = ["testes"]
+
+[tool.ruff]
+line-length = 100
