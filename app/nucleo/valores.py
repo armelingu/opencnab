@@ -7,3 +7,4 @@ def valor_cnab(valor, tamanho=13):
     while len(texto) < tamanho:
         texto = "0"+ texto
     return texto
+
