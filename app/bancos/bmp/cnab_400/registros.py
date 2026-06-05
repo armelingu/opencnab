@@ -26,7 +26,7 @@ class RegistroTipo1BMP:
         campos.append(numerico("01", 2))
         campos.append(numerico(self.documento_pagador,14))
         campos.append(alfa(self.nome_pagador,40))
-        campos.append(branco(120))
+        campos.append(branco(119))
         campos.append(numerico(self.sequencial_registro,6))
 
         linha = "".join(campos)
