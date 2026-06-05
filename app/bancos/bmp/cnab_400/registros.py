@@ -3,6 +3,7 @@ from app.nucleo.campos import branco
 from app.nucleo.campos import numerico
 from app.nucleo.datas import data_cnab
 from app.nucleo.valores import valor_cnab
+from app.bancos.bmp.cnab_400.nosso_numero import gerar_nosso_numero
 
 class RegistroTipo1BMP:
     def __init__(self, numero_documento, valor, vencimento, nome_pagador, documento_pagador, sequencial_registro):
@@ -16,7 +17,8 @@ class RegistroTipo1BMP:
     def gerar(self):
         campos = []
         campos.append(numerico("1", 1))
-        campos.append(branco(108))
+        campos.append(branco(70))
+        campos.append(numerico(nosso_numero_base, 11))
         campos.append(numerico("01", 2))
         campos.append(alfa(self.numero_documento, 10))
 
