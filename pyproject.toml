@@ -1,6 +1,6 @@
 [project]
 name = "opencnab"
-version = "0.4.0"
+version = "0.4.1"
 description = "Biblioteca Python open source para gerar e ler arquivos CNAB 400 e CNAB 240 de cobranca bancaria"
 readme = "README.md"
 license = "MIT"
@@ -34,9 +34,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 
-dependencies = [
-    "pydantic>=2.11.0"
-]
+dependencies = []
 
 [project.urls]
 Repositorio = "https://github.com/armelingu/opencnab"
