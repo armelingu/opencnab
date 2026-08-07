@@ -11,7 +11,7 @@ boleto registration and payment reconciliation.*
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
-![Testes](https://img.shields.io/badge/testes-78%20passando-brightgreen)
+![Testes](https://img.shields.io/badge/testes-103%20passando-brightgreen)
 
 ---
 
@@ -117,10 +117,44 @@ for titulo in retorno.titulos:
 Valores monetários voltam como `Decimal`, então você pode somar e comparar sem
 risco de erro de arredondamento.
 
+## Gerando o código de barras e a linha digitável
+
+O que o cliente enxerga no boleto: o código de barras que o caixa lê e a linha
+digitável que ele digita quando o leitor falha.
+
+```python
+from datetime import date
+from app.boletos.codigo_barras import gerar_codigo_barras
+from app.boletos.linha_digitavel import gerar_linha_digitavel
+from app.boletos.linha_digitavel import formatar_linha_digitavel
+
+codigo = gerar_codigo_barras(
+    codigo_banco="274",
+    valor=150.70,
+    vencimento=date(2026, 6, 30),
+    campo_livre="1234567890123456789012345"
+)
+
+linha = gerar_linha_digitavel(codigo)
+
+print(codigo)                          # 44 posições
+print(formatar_linha_digitavel(linha)) # 27491.23457 67890.123457 ...
+```
+
+O cálculo do fator de vencimento já contempla o reinício definido pela FEBRABAN:
+a contagem iniciada em 07/10/1997 atingiu o limite de 9999 em 21/02/2025, e a
+partir de 22/02/2025 o fator voltou a 1000. Boletos com vencimento antes e
+depois dessa virada são calculados corretamente.
+
+O campo livre são as 25 posições que cada banco define do seu jeito, geralmente
+combinando carteira, nosso número, agência e conta.
+
 ## Recursos
 
 - Arquivo de remessa completo em CNAB 400 (cabeçalho, títulos e trailer)
 - Leitura do arquivo de retorno, com códigos de ocorrência traduzidos
+- Código de barras de 44 posições e linha digitável de 47, no padrão FEBRABAN
+- Fator de vencimento com suporte aos dois ciclos (antes e depois de 22/02/2025)
 - Separação automática dos títulos liquidados, para baixa no contas a receber
 - Valores monetários com `Decimal`, sem perder centavos por arredondamento
 - Identificação automática de CPF e CNPJ do pagador
@@ -143,7 +177,7 @@ na maioria dos casos muda pouca coisa além do código e do nome do banco.
 
 - [x] Remessa CNAB 400 para BMP
 - [x] Leitura do arquivo de retorno, para baixa automática de contas a receber
-- [ ] Código de barras e linha digitável do boleto
+- [x] Código de barras e linha digitável do boleto
 - [ ] Publicação no PyPI (`pip install opencnab`)
 - [ ] Suporte a CNAB 240
 - [ ] Novos bancos: Bradesco, Itaú, Santander, Banco do Brasil, Caixa, Sicoob, Inter
@@ -167,6 +201,20 @@ desenvolvimento. Crie sua branch a partir de `develop` no formato
 
 Toda alteração de comportamento deve vir com teste, e a suíte precisa passar
 inteira antes do merge.
+
+## Pontos ainda em aberto
+
+Vale conhecer os limites atuais antes de colocar em produção:
+
+- As posições do CNAB 400 seguem o layout de mercado derivado do Bradesco
+  (CBR643), que o cabeçalho do BMP reproduz. Convém conferir contra o manual
+  oficial do seu banco antes do primeiro envio.
+- O campo livre do código de barras precisa ser montado por você, porque cada
+  banco define as 25 posições de um jeito. Ainda não há função pronta por banco.
+- O dígito do "nosso número" usa a regra que devolve `0`; alguns bancos usam a
+  letra `P` em um dos casos.
+- Ao ler o retorno, confira o total recebido contra o extrato na primeira vez,
+  para garantir que as posições batem com o arquivo do seu banco.
 
 ## Glossário rápido
 
