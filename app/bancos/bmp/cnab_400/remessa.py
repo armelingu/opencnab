@@ -95,7 +95,7 @@ class ArquivoRemessaBMP:
 
     def salvar(self, caminho):
         arquivo = self.gerar()
-        destino = open(caminho, "w", encoding="latin-1", newline="")
+        destino = open(caminho, "w", encoding="ascii", newline="")
         destino.write(arquivo)
         destino.close()
         return caminho

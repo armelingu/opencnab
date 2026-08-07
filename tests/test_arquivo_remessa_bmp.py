@@ -67,7 +67,7 @@ def test_arquivo_salva_em_disco(tmp_path):
     caminho = tmp_path / "remessa.rem"
     arquivo.salvar(caminho)
 
-    destino = open(caminho, "r", encoding="latin-1", newline="")
+    destino = open(caminho, "r", encoding="ascii", newline="")
     texto = destino.read()
     destino.close()
 
