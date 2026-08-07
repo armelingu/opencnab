@@ -15,3 +15,23 @@ def valor_cnab(valor, tamanho=13):
     while len(valor_texto) < tamanho:
         valor_texto = "0" + valor_texto
     return valor_texto
+
+
+# caminho contrario do valor_cnab, usado na leitura do retorno
+# o banco manda o valor em centavos e sem virgula, entao dividimos por 100
+def valor_de_cnab(texto):
+    texto = str(texto)
+
+    somente_digitos = ""
+
+    for caractere in texto:
+        if caractere.isdigit():
+            somente_digitos += caractere
+
+    if somente_digitos == "":
+        raise Exception("Valor CNAB sem digitos")
+
+    valor_centavos = Decimal(somente_digitos)
+    valor_reais = valor_centavos / Decimal(100)
+
+    return valor_reais.quantize(Decimal("0.01"))
