@@ -1,5 +1,5 @@
 from datetime import date
-from app.bancos.bmp.cnab_400.modelos import BoletoBMP
+from opencnab.bancos.bmp.cnab_400.modelos import BoletoBMP
 
 def test_criar_boleto():
     boleto = BoletoBMP(

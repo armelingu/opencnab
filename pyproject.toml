@@ -1,6 +1,6 @@
 [project]
 name = "opencnab"
-version = "0.1.0"
+version = "0.4.0"
 description = "Biblioteca Python open source para gerar e ler arquivos CNAB 400 e CNAB 240 de cobranca bancaria"
 readme = "README.md"
 license = "MIT"
@@ -54,7 +54,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["app*"]
+include = ["opencnab*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

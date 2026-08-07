@@ -1,6 +1,6 @@
 from datetime import date
-from app.bancos.bmp.cnab_400.remessa import ArquivoRemessaBMP
-from app.bancos.bmp.cnab_400.modelos import BoletoBMP
+from opencnab.bancos.bmp.cnab_400.remessa import ArquivoRemessaBMP
+from opencnab.bancos.bmp.cnab_400.modelos import BoletoBMP
 
 
 def criar_arquivo():

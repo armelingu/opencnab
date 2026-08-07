@@ -11,7 +11,7 @@ boleto registration and payment reconciliation.*
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
-![Testes](https://img.shields.io/badge/testes-103%20passando-brightgreen)
+![Testes](https://img.shields.io/badge/testes-117%20passando-brightgreen)
 
 ---
 
@@ -49,8 +49,8 @@ Gerar um arquivo de remessa completo, pronto para enviar ao banco:
 
 ```python
 from datetime import date
-from app.bancos.bmp.cnab_400.remessa import ArquivoRemessaBMP
-from app.bancos.bmp.cnab_400.modelos import BoletoBMP
+from opencnab.bancos.bmp.cnab_400.remessa import ArquivoRemessaBMP
+from opencnab.bancos.bmp.cnab_400.modelos import BoletoBMP
 
 remessa = ArquivoRemessaBMP(
     codigo_empresa="123",
@@ -92,7 +92,7 @@ O retorno é o arquivo que o banco devolve informando o que aconteceu com cada
 título. É com ele que você dá baixa automática no contas a receber:
 
 ```python
-from app.bancos.bmp.cnab_400.retorno import ler_arquivo_retorno
+from opencnab.bancos.bmp.cnab_400.retorno import ler_arquivo_retorno
 
 retorno = ler_arquivo_retorno("retorno.ret")
 
@@ -124,9 +124,9 @@ digitável que ele digita quando o leitor falha.
 
 ```python
 from datetime import date
-from app.boletos.codigo_barras import gerar_codigo_barras
-from app.boletos.linha_digitavel import gerar_linha_digitavel
-from app.boletos.linha_digitavel import formatar_linha_digitavel
+from opencnab.boletos.codigo_barras import gerar_codigo_barras
+from opencnab.boletos.linha_digitavel import gerar_linha_digitavel
+from opencnab.boletos.linha_digitavel import formatar_linha_digitavel
 
 codigo = gerar_codigo_barras(
     codigo_banco="274",
@@ -149,11 +149,34 @@ depois dessa virada são calculados corretamente.
 O campo livre são as 25 posições que cada banco define do seu jeito, geralmente
 combinando carteira, nosso número, agência e conta.
 
+Para os bancos já implementados você não precisa montar o campo livre na mão:
+
+```python
+from datetime import date
+from opencnab.bancos.itau.boleto import BoletoItau
+
+boleto = BoletoItau(
+    agencia="1234",
+    conta="56789",
+    carteira="109",
+    nosso_numero="12345678",
+    valor=1250.55,
+    vencimento=date(2026, 9, 15)
+)
+
+print(boleto.gerar_codigo_barras())
+print(boleto.gerar_linha_digitavel_formatada())
+```
+
+O Itaú calcula dois dígitos verificadores próprios dentro do campo livre: um para
+o nosso número e outro para a conta, ambos em módulo 10. A biblioteca cuida disso.
+
 ## Recursos
 
 - Arquivo de remessa completo em CNAB 400 (cabeçalho, títulos e trailer)
 - Leitura do arquivo de retorno, com códigos de ocorrência traduzidos
 - Código de barras de 44 posições e linha digitável de 47, no padrão FEBRABAN
+- Campo livre do boleto do Itaú, com os dois dígitos verificadores que ele exige
 - Fator de vencimento com suporte aos dois ciclos (antes e depois de 22/02/2025)
 - Separação automática dos títulos liquidados, para baixa no contas a receber
 - Valores monetários com `Decimal`, sem perder centavos por arredondamento
@@ -165,22 +188,28 @@ combinando carteira, nosso número, agência e conta.
 
 ## Bancos e layouts suportados
 
-| Banco | Código | Layout | Remessa | Retorno |
+| Banco | Código | Remessa CNAB 400 | Retorno CNAB 400 | Boleto |
 |---|---|---|---|---|
-| BMP Money Plus | 274 | CNAB 400 | Sim | Sim |
+| BMP Money Plus | 274 | Sim | Sim | Genérico |
+| Itaú | 341 | Não | Não | Sim |
 
 O layout CNAB 400 usado segue o padrão de mercado derivado do Bradesco (CBR643),
 que é adotado por vários bancos médios. Isso facilita adicionar novos bancos:
 na maioria dos casos muda pouca coisa além do código e do nome do banco.
+
+Na coluna Boleto, "genérico" quer dizer que o código de barras é gerado, mas você
+precisa montar o campo livre das 25 posições conforme o manual do seu banco.
 
 ## Roadmap
 
 - [x] Remessa CNAB 400 para BMP
 - [x] Leitura do arquivo de retorno, para baixa automática de contas a receber
 - [x] Código de barras e linha digitável do boleto
+- [x] Campo livre do boleto do Itaú
 - [ ] Publicação no PyPI (`pip install opencnab`)
+- [ ] Remessa e retorno do Itaú em CNAB 400
 - [ ] Suporte a CNAB 240
-- [ ] Novos bancos: Bradesco, Itaú, Santander, Banco do Brasil, Caixa, Sicoob, Inter
+- [ ] Novos bancos: Bradesco, Santander, Banco do Brasil, Caixa, Sicoob, Inter
 
 ## Testes
 
@@ -209,8 +238,8 @@ Vale conhecer os limites atuais antes de colocar em produção:
 - As posições do CNAB 400 seguem o layout de mercado derivado do Bradesco
   (CBR643), que o cabeçalho do BMP reproduz. Convém conferir contra o manual
   oficial do seu banco antes do primeiro envio.
-- O campo livre do código de barras precisa ser montado por você, porque cada
-  banco define as 25 posições de um jeito. Ainda não há função pronta por banco.
+- Fora o Itaú, o campo livre do código de barras precisa ser montado por você,
+  porque cada banco define as 25 posições de um jeito.
 - O dígito do "nosso número" usa a regra que devolve `0`; alguns bancos usam a
   letra `P` em um dos casos.
 - Ao ler o retorno, confira o total recebido contra o extrato na primeira vez,

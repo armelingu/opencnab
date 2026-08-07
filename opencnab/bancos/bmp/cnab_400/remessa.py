@@ -1,8 +1,8 @@
-from app.nucleo.campos import alfa
-from app.nucleo.campos import branco
-from app.nucleo.campos import numerico
-from app.nucleo.datas import data_cnab
-from app.bancos.bmp.cnab_400.registros import RegistroTipo1BMP
+from opencnab.nucleo.campos import alfa
+from opencnab.nucleo.campos import branco
+from opencnab.nucleo.campos import numerico
+from opencnab.nucleo.datas import data_cnab
+from opencnab.bancos.bmp.cnab_400.registros import RegistroTipo1BMP
 
 class HeaderRemessaBMP:
 
