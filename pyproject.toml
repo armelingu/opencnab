@@ -1,15 +1,46 @@
 [project]
 name = "opencnab"
 version = "0.1.0"
-description = "Biblioteca Open Source para CNAB 240 e CNAB 400"
+description = "Biblioteca Python open source para gerar e ler arquivos CNAB 400 e CNAB 240 de cobranca bancaria"
+readme = "README.md"
+license = "MIT"
 authors = [
     {name = "Gustavo Armelin"}
 ]
 requires-python = ">=3.11"
+keywords = [
+    "cnab",
+    "cnab400",
+    "cnab240",
+    "boleto",
+    "boleto-bancario",
+    "remessa",
+    "retorno",
+    "cobranca",
+    "febraban",
+    "banco",
+    "financeiro"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Natural Language :: Portuguese (Brazilian)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
 
 dependencies = [
     "pydantic>=2.11.0"
 ]
+
+[project.urls]
+Repositorio = "https://github.com/armelingu/opencnab"
+Issues = "https://github.com/armelingu/opencnab/issues"
 
 [project.optional-dependencies]
 dev = [
@@ -17,6 +48,13 @@ dev = [
     "pytest-cov",
     "ruff"
 ]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
