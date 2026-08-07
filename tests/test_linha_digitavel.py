@@ -91,3 +91,22 @@ def test_formatar_linha_digitavel_tamanho_errado():
         mensagem = str(erro)
 
     assert mensagem == "Linha digitavel precisa ter 47 posicoes"
+
+
+# valores congelados de um boleto ficticio, conferidos contra um boleto
+# de verdade na epoca em que o calculo foi escrito
+# se algum destes tres assert quebrar, o boleto gerado deixou de ser valido
+def test_boleto_conhecido_codigo_de_barras():
+    resultado = criar_codigo_barras()
+    assert resultado == "27497149300000150701234567890123456789012345"
+
+
+def test_boleto_conhecido_linha_digitavel():
+    resultado = gerar_linha_digitavel(criar_codigo_barras())
+    assert resultado == "27491234576789012345767890123457714930000015070"
+
+
+def test_boleto_conhecido_linha_formatada():
+    linha = gerar_linha_digitavel(criar_codigo_barras())
+    resultado = formatar_linha_digitavel(linha)
+    assert resultado == "27491.23457 67890.123457 67890.123457 7 14930000015070"
