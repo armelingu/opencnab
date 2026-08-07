@@ -12,6 +12,7 @@ boleto registration and payment reconciliation.*
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
 ![Testes](https://img.shields.io/badge/testes-117%20passando-brightgreen)
+![Dependências](https://img.shields.io/badge/depend%C3%AAncias-nenhuma-lightgrey)
 
 ---
 
@@ -29,7 +30,9 @@ para qualquer banco.
 
 ## Instalação
 
-Requer Python 3.11 ou superior.
+Requer Python 3.11 ou superior e nada mais: a biblioteca usa só a biblioteca
+padrão do Python, então instalar não arrasta nenhuma dependência para o seu
+projeto.
 
 ```bash
 git clone https://github.com/armelingu/opencnab.git
