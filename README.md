@@ -12,8 +12,8 @@ O projeto oferece utilitários para:
 
 ## Recursos atuais
 
-- Cabeçalho de remessa para BMP Money Plus (CNAB 400)
-- Registro tipo 1 para BMP (CNAB 400)
+- Arquivo de remessa completo para BMP Money Plus (CNAB 400)
+- Cabeçalho, registro tipo 1 e trailer para BMP (CNAB 400)
 - Geração de "nosso número" com cálculo do dígito verificador
 - Modelos de boleto para uso interno
 - Validação e formatação de campos CNAB
@@ -73,6 +73,7 @@ from app.bancos.bmp.cnab_400.registros import RegistroTipo1BMP
 
 registro = RegistroTipo1BMP(
     numero_documento="NF001",
+    nosso_numero="1",
     valor=150.70,
     vencimento=date(2026, 6, 30),
     nome_pagador="CLIENTE TESTE",
@@ -81,6 +82,35 @@ registro = RegistroTipo1BMP(
 )
 linha_registro = registro.gerar()
 print(len(linha_registro))  # 400
+```
+
+### Gerar o arquivo de remessa completo
+
+Esta é a forma recomendada de uso: a classe monta o cabeçalho, um registro por
+boleto e o trailer, controlando o sequencial de cada linha.
+
+```python
+from datetime import date
+from app.bancos.bmp.cnab_400.remessa import ArquivoRemessaBMP
+from app.bancos.bmp.cnab_400.modelos import BoletoBMP
+
+arquivo = ArquivoRemessaBMP(
+    codigo_empresa="123",
+    nome_empresa="EMPRESA TESTE",
+    data_geracao=date(2026, 6, 5),
+    sequencial_remessa=1
+)
+
+arquivo.adicionar_boleto(BoletoBMP(
+    numero_documento="NF001",
+    nosso_numero="1",
+    valor=150.70,
+    vencimento=date(2026, 6, 30),
+    nome_pagador="CLIENTE UM",
+    documento_pagador="12345678901"
+))
+
+arquivo.salvar("remessa.rem")
 ```
 
 ### Criar boleto BMP
@@ -118,6 +148,15 @@ pytest
 ## Limitações e escopo
 
 Atualmente, o foco principal é o suporte a BMP no formato CNAB 400. O projeto pode ser ampliado para outros bancos e formatos em versões futuras.
+
+Pontos ainda em aberto na remessa BMP:
+
+- a leitura do arquivo de retorno do banco não foi implementada
+- o tipo de inscrição do pagador está fixo em CPF (`01`); ainda não distingue CNPJ
+- o campo alfanumérico não remove acentos, então nomes acentuados dependem da
+  codificação `latin-1` na gravação
+- as posições seguem o layout CNAB 400 padrão Bradesco (CBR643), que o cabeçalho
+  do BMP reproduz; convém conferir com o manual oficial do banco
 
 ## Licença
 
