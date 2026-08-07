@@ -1,9 +1,9 @@
 from datetime import date
 from decimal import Decimal
-from app.bancos.bmp.cnab_400.retorno import ArquivoRetornoBMP
-from app.bancos.bmp.cnab_400.retorno import ler_titulo
-from app.bancos.bmp.cnab_400.retorno import ler_arquivo_retorno
-from app.bancos.bmp.cnab_400.retorno import descrever_ocorrencia
+from opencnab.bancos.bmp.cnab_400.retorno import ArquivoRetornoBMP
+from opencnab.bancos.bmp.cnab_400.retorno import ler_titulo
+from opencnab.bancos.bmp.cnab_400.retorno import ler_arquivo_retorno
+from opencnab.bancos.bmp.cnab_400.retorno import descrever_ocorrencia
 
 
 # monta uma linha de 400 posicoes colocando cada campo na posicao do layout

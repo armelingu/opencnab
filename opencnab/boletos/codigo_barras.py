@@ -1,7 +1,7 @@
 from datetime import date
-from app.nucleo.campos import numerico
-from app.nucleo.valores import valor_cnab
-from app.nucleo.modulo11 import calcular_digito_codigo_barras
+from opencnab.nucleo.campos import numerico
+from opencnab.nucleo.valores import valor_cnab
+from opencnab.nucleo.modulo11 import calcular_digito_codigo_barras
 
 # o fator de vencimento conta os dias ate o vencimento a partir de uma data base
 # a contagem antiga comecou em 07/10/1997 e estourou o limite 9999 em 21/02/2025

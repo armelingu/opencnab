@@ -1,7 +1,7 @@
 from datetime import date
-from app.boletos.codigo_barras import calcular_fator_vencimento
-from app.boletos.codigo_barras import gerar_codigo_barras
-from app.nucleo.modulo11 import calcular_digito_codigo_barras
+from opencnab.boletos.codigo_barras import calcular_fator_vencimento
+from opencnab.boletos.codigo_barras import gerar_codigo_barras
+from opencnab.nucleo.modulo11 import calcular_digito_codigo_barras
 
 
 def test_fator_vencimento_antes_do_reinicio():

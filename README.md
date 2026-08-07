@@ -49,8 +49,8 @@ Gerar um arquivo de remessa completo, pronto para enviar ao banco:
 
 ```python
 from datetime import date
-from app.bancos.bmp.cnab_400.remessa import ArquivoRemessaBMP
-from app.bancos.bmp.cnab_400.modelos import BoletoBMP
+from opencnab.bancos.bmp.cnab_400.remessa import ArquivoRemessaBMP
+from opencnab.bancos.bmp.cnab_400.modelos import BoletoBMP
 
 remessa = ArquivoRemessaBMP(
     codigo_empresa="123",
@@ -92,7 +92,7 @@ O retorno é o arquivo que o banco devolve informando o que aconteceu com cada
 título. É com ele que você dá baixa automática no contas a receber:
 
 ```python
-from app.bancos.bmp.cnab_400.retorno import ler_arquivo_retorno
+from opencnab.bancos.bmp.cnab_400.retorno import ler_arquivo_retorno
 
 retorno = ler_arquivo_retorno("retorno.ret")
 
@@ -124,9 +124,9 @@ digitável que ele digita quando o leitor falha.
 
 ```python
 from datetime import date
-from app.boletos.codigo_barras import gerar_codigo_barras
-from app.boletos.linha_digitavel import gerar_linha_digitavel
-from app.boletos.linha_digitavel import formatar_linha_digitavel
+from opencnab.boletos.codigo_barras import gerar_codigo_barras
+from opencnab.boletos.linha_digitavel import gerar_linha_digitavel
+from opencnab.boletos.linha_digitavel import formatar_linha_digitavel
 
 codigo = gerar_codigo_barras(
     codigo_banco="274",

@@ -1,5 +1,5 @@
 from datetime import date
-from app.bancos.bmp.cnab_400.registros import RegistroTipo1BMP
+from opencnab.bancos.bmp.cnab_400.registros import RegistroTipo1BMP
 
 
 def criar_registro():

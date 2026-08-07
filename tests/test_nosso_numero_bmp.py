@@ -1,4 +1,4 @@
-from app.bancos.bmp.cnab_400.nosso_numero import gerar_nosso_numero
+from opencnab.bancos.bmp.cnab_400.nosso_numero import gerar_nosso_numero
 
 
 def test_nosso_numero_completo():

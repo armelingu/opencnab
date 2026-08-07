@@ -1,5 +1,5 @@
-from app.nucleo.validacoes import somente_numeros
-from app.nucleo.validacoes import tipo_inscricao
+from opencnab.nucleo.validacoes import somente_numeros
+from opencnab.nucleo.validacoes import tipo_inscricao
 
 
 def test_somente_numeros():

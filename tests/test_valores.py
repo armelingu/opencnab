@@ -1,6 +1,6 @@
 from decimal import Decimal
-from app.nucleo.valores import valor_cnab
-from app.nucleo.valores import valor_de_cnab
+from opencnab.nucleo.valores import valor_cnab
+from opencnab.nucleo.valores import valor_de_cnab
 
 def test_valor_cnab_centavos():
     resultado = valor_cnab(150.75)
