@@ -55,6 +55,19 @@ def test_registro_tipo1_documento_pagador():
     assert linha[221:235] == "00012345678901"
 
 
+def test_registro_tipo1_pagador_cpf():
+    registro = criar_registro()
+    linha = registro.gerar()
+    assert linha[219:221] == "01"
+
+
+def test_registro_tipo1_pagador_cnpj():
+    registro = RegistroTipo1BMP(numero_documento="NF001", nosso_numero="1", valor=150.70, vencimento=date(2026, 6, 30), nome_pagador="EMPRESA TESTE", documento_pagador="12345678000199", sequencial_registro=2)
+    linha = registro.gerar()
+    assert linha[219:221] == "02"
+    assert linha[221:235] == "12345678000199"
+
+
 def test_registro_tipo1_nome_pagador():
     registro = criar_registro()
     linha = registro.gerar()
