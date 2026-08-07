@@ -3,6 +3,7 @@ from app.nucleo.campos import branco
 from app.nucleo.campos import numerico
 from app.nucleo.datas import data_cnab
 from app.nucleo.valores import valor_cnab
+from app.nucleo.validacoes import tipo_inscricao
 from app.bancos.bmp.cnab_400.nosso_numero import gerar_nosso_numero
 
 # registro tipo 1 (detalhe) do CNAB 400
@@ -35,7 +36,7 @@ class RegistroTipo1BMP:
         campos.append(data_cnab(self.vencimento))                    #122-127 data de vencimento
         campos.append(valor_cnab(self.valor))                        #128-140 valor do titulo
         campos.append(branco(79))                                    #141-219 uso do banco
-        campos.append(numerico("01", 2))                             #220-221 tipo de inscricao do pagador
+        campos.append(numerico(tipo_inscricao(self.documento_pagador), 2)) #220-221 01 = CPF e 02 = CNPJ
         campos.append(numerico(self.documento_pagador, 14))          #222-235 cpf ou cnpj do pagador
         campos.append(alfa(self.nome_pagador, 40))                   #236-275 nome do pagador
         campos.append(branco(119))                                   #276-394 endereco e mensagens

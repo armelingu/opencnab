@@ -1,30 +1,35 @@
 # OpenCNAB
 
-OpenCNAB é uma biblioteca Python para trabalhar com arquivos CNAB, focada em CNAB 400 e suporte inicial ao banco BMP.
+**Biblioteca Python open source para gerar e ler arquivos CNAB 400 e CNAB 240 de cobrança bancária.**
 
-## Visão geral
+Crie arquivos de remessa de boletos para o seu banco em poucas linhas de Python,
+sem depender de serviço pago, sem taxa por boleto e sem ficar preso à API
+proprietária de um único banco.
 
-O projeto oferece utilitários para:
-- gerar registros de remessa em formato CNAB 400
-- formatar campos de data e valores para CNAB
-- gerar "nosso número" com dígito verificador
-- representar boletos e dados de cobrança
+*Python library for Brazilian bank exchange files (CNAB / FEBRABAN) used for
+boleto registration and payment reconciliation.*
 
-## Recursos atuais
+![Python](https://img.shields.io/badge/python-3.11%2B-blue)
+![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
+![Testes](https://img.shields.io/badge/testes-54%20passando-brightgreen)
 
-- Arquivo de remessa completo para BMP Money Plus (CNAB 400)
-- Cabeçalho, registro tipo 1 e trailer para BMP (CNAB 400)
-- Geração de "nosso número" com cálculo do dígito verificador
-- Modelos de boleto para uso interno
-- Validação e formatação de campos CNAB
+---
 
-## Requisitos
+## Por que este projeto existe
 
-- Python 3.11 ou superior
+Toda empresa brasileira que emite boleto registrado precisa trocar arquivos CNAB
+com o banco: um arquivo de **remessa** para registrar os títulos e um arquivo de
+**retorno** para saber quem pagou.
+
+Na prática, quem precisa fazer isso hoje tem três caminhos ruins: usar uma
+biblioteca antiga e sem manutenção, pagar por boleto emitido, ou integrar a API
+proprietária de cada banco e ficar refém dela. O OpenCNAB existe para ser a
+quarta opção: código aberto, sem custo por boleto e com o mesmo modelo de uso
+para qualquer banco.
 
 ## Instalação
 
-Para instalar localmente:
+Requer Python 3.11 ou superior.
 
 ```bash
 git clone https://github.com/armelingu/opencnab.git
@@ -32,132 +37,113 @@ cd opencnab
 pip install .
 ```
 
-Para instalar dependências de desenvolvimento:
+Para desenvolver:
 
 ```bash
-pip install -e .[dev]
+pip install -e ".[dev]"
 ```
 
-## Uso
+## Começando
 
-### Gerar nosso número
-
-```python
-from app.bancos.bmp.cnab_400.nosso_numero import gerar_nosso_numero
-
-nosso_numero = gerar_nosso_numero("12345")
-print(nosso_numero)  # Ex: 00000012345-<digito>
-```
-
-### Gerar cabeçalho de remessa BMP CNAB 400
-
-```python
-from datetime import date
-from app.bancos.bmp.cnab_400.remessa import HeaderRemessaBMP
-
-header = HeaderRemessaBMP(
-    codigo_empresa="123",
-    nome_empresa="EMPRESA TESTE",
-    data_geracao=date(2026, 6, 5),
-    sequencial_remessa=1
-)
-linha_header = header.gerar()
-print(len(linha_header))  # 400
-```
-
-### Gerar registro tipo 1 BMP CNAB 400
-
-```python
-from datetime import date
-from app.bancos.bmp.cnab_400.registros import RegistroTipo1BMP
-
-registro = RegistroTipo1BMP(
-    numero_documento="NF001",
-    nosso_numero="1",
-    valor=150.70,
-    vencimento=date(2026, 6, 30),
-    nome_pagador="CLIENTE TESTE",
-    documento_pagador="12345678901",
-    sequencial_registro=2
-)
-linha_registro = registro.gerar()
-print(len(linha_registro))  # 400
-```
-
-### Gerar o arquivo de remessa completo
-
-Esta é a forma recomendada de uso: a classe monta o cabeçalho, um registro por
-boleto e o trailer, controlando o sequencial de cada linha.
+Gerar um arquivo de remessa completo, pronto para enviar ao banco:
 
 ```python
 from datetime import date
 from app.bancos.bmp.cnab_400.remessa import ArquivoRemessaBMP
 from app.bancos.bmp.cnab_400.modelos import BoletoBMP
 
-arquivo = ArquivoRemessaBMP(
+remessa = ArquivoRemessaBMP(
     codigo_empresa="123",
-    nome_empresa="EMPRESA TESTE",
+    nome_empresa="MINHA EMPRESA LTDA",
     data_geracao=date(2026, 6, 5),
     sequencial_remessa=1
 )
 
-arquivo.adicionar_boleto(BoletoBMP(
+remessa.adicionar_boleto(BoletoBMP(
     numero_documento="NF001",
     nosso_numero="1",
     valor=150.70,
     vencimento=date(2026, 6, 30),
-    nome_pagador="CLIENTE UM",
-    documento_pagador="12345678901"
+    nome_pagador="José Antônio da Conceição",
+    documento_pagador="123.456.789-01"
 ))
 
-arquivo.salvar("remessa.rem")
+remessa.adicionar_boleto(BoletoBMP(
+    numero_documento="NF002",
+    nosso_numero="2",
+    valor=2500.00,
+    vencimento=date(2026, 7, 15),
+    nome_pagador="Padaria São João Ltda",
+    documento_pagador="12.345.678/0001-99"
+))
+
+remessa.salvar("remessa.rem")
 ```
 
-### Criar boleto BMP
+A biblioteca cuida dos detalhes que costumam gerar rejeição no banco: monta o
+cabeçalho e o trailer, numera o sequencial de cada linha, identifica
+automaticamente se o pagador é CPF ou CNPJ, remove acentos dos nomes, formata
+datas e valores no padrão CNAB e garante que toda linha tenha exatamente 400
+posições.
 
-```python
-from datetime import date
-from app.bancos.bmp.cnab_400.modelos import BoletoBMP
+## Recursos
 
-boleto = BoletoBMP(
-    numero_documento="NF001",
-    nosso_numero="0000000001",
-    valor=150.75,
-    vencimento=date(2026, 6, 30),
-    nome_pagador="CLIENTE TESTE",
-    documento_pagador="12345678901"
-)
-print(boleto.numero_documento)
-```
+- Arquivo de remessa completo em CNAB 400 (cabeçalho, títulos e trailer)
+- Valores monetários com `Decimal`, sem perder centavos por arredondamento
+- Identificação automática de CPF e CNPJ do pagador
+- Campos alfanuméricos limpos e garantidos em ASCII, como o banco exige
+- Geração de "nosso número" com dígito verificador
+- Cálculo de dígito verificador nos módulos 10 e 11
+- Formatação de campos, datas e valores no padrão CNAB
+
+## Bancos e layouts suportados
+
+| Banco | Código | Layout | Remessa | Retorno |
+|---|---|---|---|---|
+| BMP Money Plus | 274 | CNAB 400 | Sim | Em desenvolvimento |
+
+O layout CNAB 400 usado segue o padrão de mercado derivado do Bradesco (CBR643),
+que é adotado por vários bancos médios. Isso facilita adicionar novos bancos:
+na maioria dos casos muda pouca coisa além do código e do nome do banco.
+
+## Roadmap
+
+- [x] Remessa CNAB 400 para BMP
+- [ ] Leitura do arquivo de retorno, para baixa automática de contas a receber
+- [ ] Código de barras e linha digitável do boleto
+- [ ] Publicação no PyPI (`pip install opencnab`)
+- [ ] Suporte a CNAB 240
+- [ ] Novos bancos: Bradesco, Itaú, Santander, Banco do Brasil, Caixa, Sicoob, Inter
 
 ## Testes
-
-Execute a suíte de testes com:
 
 ```bash
 pytest
 ```
 
-## Estrutura do projeto
+## Como contribuir
 
-- `app/bancos/bmp/cnab_400/` - implementação de BMP CNAB 400
-- `app/boletos/` - classes auxiliares para boletos
-- `app/nucleo/` - formatação de campos, datas, valores e validações
-- `tests/` - casos de teste para as funcionalidades
+Contribuições são bem-vindas, principalmente layouts de bancos que você já usa
+em produção.
 
-## Limitações e escopo
+O projeto usa `main` como branch estável e `develop` como base do
+desenvolvimento. Crie sua branch a partir de `develop` no formato
+`tipo/escopo-descricao`, por exemplo `feat/itau-remessa-cnab400` ou
+`fix/nucleo-valor-cnab-decimal`. Os tipos são `feat`, `fix`, `refactor`, `test`,
+`docs` e `hotfix`, e as mensagens de commit usam o mesmo prefixo.
 
-Atualmente, o foco principal é o suporte a BMP no formato CNAB 400. O projeto pode ser ampliado para outros bancos e formatos em versões futuras.
+Toda alteração de comportamento deve vir com teste, e a suíte precisa passar
+inteira antes do merge.
 
-Pontos ainda em aberto na remessa BMP:
+## Glossário rápido
 
-- a leitura do arquivo de retorno do banco não foi implementada
-- o tipo de inscrição do pagador está fixo em CPF (`01`); ainda não distingue CNPJ
-- o campo alfanumérico não remove acentos, então nomes acentuados dependem da
-  codificação `latin-1` na gravação
-- as posições seguem o layout CNAB 400 padrão Bradesco (CBR643), que o cabeçalho
-  do BMP reproduz; convém conferir com o manual oficial do banco
+- **CNAB**: padrão de arquivo texto de posição fixa usado na troca de informações
+  entre empresas e bancos, definido pela FEBRABAN.
+- **Remessa**: arquivo que a empresa envia ao banco para registrar boletos.
+- **Retorno**: arquivo que o banco devolve informando pagamentos e ocorrências.
+- **Nosso número**: identificador do título no banco, definido pela empresa.
+- **Pagador**: quem deve pagar o boleto (antigamente chamado de sacado).
 
 ## Licença
 
-Consulte o arquivo `LICENSE` para detalhes sobre a licença do projeto.
+Distribuído sob a licença MIT. Veja o arquivo [LICENSE](LICENSE).
