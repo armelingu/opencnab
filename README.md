@@ -11,7 +11,7 @@ boleto registration and payment reconciliation.*
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
-![Testes](https://img.shields.io/badge/testes-54%20passando-brightgreen)
+![Testes](https://img.shields.io/badge/testes-78%20passando-brightgreen)
 
 ---
 
@@ -86,9 +86,42 @@ automaticamente se o pagador é CPF ou CNPJ, remove acentos dos nomes, formata
 datas e valores no padrão CNAB e garante que toda linha tenha exatamente 400
 posições.
 
+## Lendo o retorno do banco
+
+O retorno é o arquivo que o banco devolve informando o que aconteceu com cada
+título. É com ele que você dá baixa automática no contas a receber:
+
+```python
+from app.bancos.bmp.cnab_400.retorno import ler_arquivo_retorno
+
+retorno = ler_arquivo_retorno("retorno.ret")
+
+for titulo in retorno.pagos():
+    print(titulo.nosso_numero, titulo.numero_documento, titulo.valor_pago)
+
+print("Total creditado:", retorno.total_pago())
+```
+
+Cada título traz o código de ocorrência já traduzido, o valor originalmente
+cobrado, o valor efetivamente pago, juros, despesas e a data do crédito em
+conta:
+
+```python
+for titulo in retorno.titulos:
+    print(titulo.ocorrencia, titulo.descricao(), titulo.foi_pago())
+
+# 06 Liquidacao normal True
+# 02 Entrada confirmada False
+```
+
+Valores monetários voltam como `Decimal`, então você pode somar e comparar sem
+risco de erro de arredondamento.
+
 ## Recursos
 
 - Arquivo de remessa completo em CNAB 400 (cabeçalho, títulos e trailer)
+- Leitura do arquivo de retorno, com códigos de ocorrência traduzidos
+- Separação automática dos títulos liquidados, para baixa no contas a receber
 - Valores monetários com `Decimal`, sem perder centavos por arredondamento
 - Identificação automática de CPF e CNPJ do pagador
 - Campos alfanuméricos limpos e garantidos em ASCII, como o banco exige
@@ -100,7 +133,7 @@ posições.
 
 | Banco | Código | Layout | Remessa | Retorno |
 |---|---|---|---|---|
-| BMP Money Plus | 274 | CNAB 400 | Sim | Em desenvolvimento |
+| BMP Money Plus | 274 | CNAB 400 | Sim | Sim |
 
 O layout CNAB 400 usado segue o padrão de mercado derivado do Bradesco (CBR643),
 que é adotado por vários bancos médios. Isso facilita adicionar novos bancos:
@@ -109,7 +142,7 @@ na maioria dos casos muda pouca coisa além do código e do nome do banco.
 ## Roadmap
 
 - [x] Remessa CNAB 400 para BMP
-- [ ] Leitura do arquivo de retorno, para baixa automática de contas a receber
+- [x] Leitura do arquivo de retorno, para baixa automática de contas a receber
 - [ ] Código de barras e linha digitável do boleto
 - [ ] Publicação no PyPI (`pip install opencnab`)
 - [ ] Suporte a CNAB 240
