@@ -1,4 +1,4 @@
-from app.nucleo.modulo10 import calcular_digito_verificador
+from opencnab.nucleo.modulo10 import calcular_digito_verificador
 
 '''
 a linha digitavel e o proprio codigo de barras embaralhado em 5 campos,

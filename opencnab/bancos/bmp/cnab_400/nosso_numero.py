@@ -1,4 +1,4 @@
-from app.nucleo.modulo11 import calcular_digito_verificador
+from opencnab.nucleo.modulo11 import calcular_digito_verificador
 
 def gerar_nosso_numero(numero, carteira="109"):
     numero = str(numero)

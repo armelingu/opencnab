@@ -1,8 +1,8 @@
 from datetime import date
-from app.boletos.codigo_barras import gerar_codigo_barras
-from app.boletos.linha_digitavel import gerar_linha_digitavel
-from app.boletos.linha_digitavel import formatar_linha_digitavel
-from app.nucleo.modulo10 import calcular_digito_verificador
+from opencnab.boletos.codigo_barras import gerar_codigo_barras
+from opencnab.boletos.linha_digitavel import gerar_linha_digitavel
+from opencnab.boletos.linha_digitavel import formatar_linha_digitavel
+from opencnab.nucleo.modulo10 import calcular_digito_verificador
 
 
 def criar_codigo_barras():

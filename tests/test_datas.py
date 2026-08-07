@@ -1,6 +1,6 @@
 from datetime import date
-from app.nucleo.datas import data_cnab
-from app.nucleo.datas import data_de_cnab
+from opencnab.nucleo.datas import data_cnab
+from opencnab.nucleo.datas import data_de_cnab
 
 def test_data_cnab():
     resultado = data_cnab(date(2026, 5, 30))

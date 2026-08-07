@@ -1,6 +1,6 @@
 from decimal import Decimal
-from app.nucleo.datas import data_de_cnab
-from app.nucleo.valores import valor_de_cnab
+from opencnab.nucleo.datas import data_de_cnab
+from opencnab.nucleo.valores import valor_de_cnab
 
 # codigos de ocorrencia que o banco manda no retorno
 # e o que cada um significa para quem esta conciliando

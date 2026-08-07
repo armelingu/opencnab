@@ -1,8 +1,8 @@
-from app.nucleo.campos import numerico
-from app.nucleo.campos import alfa
-from app.nucleo.campos import branco
-from app.nucleo.campos import zeros
-from app.nucleo.campos import remover_acentos
+from opencnab.nucleo.campos import numerico
+from opencnab.nucleo.campos import alfa
+from opencnab.nucleo.campos import branco
+from opencnab.nucleo.campos import zeros
+from opencnab.nucleo.campos import remover_acentos
 
 
 def test_remover_acentos():

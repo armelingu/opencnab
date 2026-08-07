@@ -1,4 +1,4 @@
-from app.bancos.bmp.cnab_400.remessa import TrailerRemessaBMP
+from opencnab.bancos.bmp.cnab_400.remessa import TrailerRemessaBMP
 
 
 def test_trailer_400_posicoes():

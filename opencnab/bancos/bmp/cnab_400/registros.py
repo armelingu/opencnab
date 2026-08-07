@@ -1,10 +1,10 @@
-from app.nucleo.campos import alfa
-from app.nucleo.campos import branco
-from app.nucleo.campos import numerico
-from app.nucleo.datas import data_cnab
-from app.nucleo.valores import valor_cnab
-from app.nucleo.validacoes import tipo_inscricao
-from app.bancos.bmp.cnab_400.nosso_numero import gerar_nosso_numero
+from opencnab.nucleo.campos import alfa
+from opencnab.nucleo.campos import branco
+from opencnab.nucleo.campos import numerico
+from opencnab.nucleo.datas import data_cnab
+from opencnab.nucleo.valores import valor_cnab
+from opencnab.nucleo.validacoes import tipo_inscricao
+from opencnab.bancos.bmp.cnab_400.nosso_numero import gerar_nosso_numero
 
 # registro tipo 1 (detalhe) do CNAB 400
 # cada registro tipo 1 representa um titulo enviado para o banco
