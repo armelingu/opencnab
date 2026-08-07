@@ -33,3 +33,21 @@ class HeaderRemessaBMP:
 
         linha = "".join(campos)
         return linha
+
+
+# trailer (registro tipo 9) e a ultima linha do arquivo
+# sem ele o banco rejeita a remessa inteira
+class TrailerRemessaBMP:
+
+    def __init__(self, sequencial_registro):
+        self.sequencial_registro = sequencial_registro
+
+    def gerar(self):
+        campos = []
+
+        campos.append(numerico("9", 1))                              #001-001 identificacao do registro
+        campos.append(branco(393))                                   #002-394 uso do banco
+        campos.append(numerico(self.sequencial_registro, 6))         #395-400 sequencial do registro
+
+        linha = "".join(campos)
+        return linha
