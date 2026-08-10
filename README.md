@@ -11,7 +11,7 @@ boleto registration and payment reconciliation.*
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
-![Testes](https://img.shields.io/badge/testes-117%20passando-brightgreen)
+![Testes](https://img.shields.io/badge/testes-165%20passando-brightgreen)
 ![Dependências](https://img.shields.io/badge/depend%C3%AAncias-nenhuma-lightgrey)
 
 ---
@@ -120,6 +120,56 @@ for titulo in retorno.titulos:
 Valores monetários voltam como `Decimal`, então você pode somar e comparar sem
 risco de erro de arredondamento.
 
+## Trocando de banco: Itaú
+
+Cada banco tem sua própria classe, mas o modo de usar é o mesmo. No Itaú a conta
+e a carteira entram no arquivo, e o dígito verificador da conta é calculado
+automaticamente:
+
+```python
+from datetime import date
+from opencnab.bancos.itau.cnab_400.remessa import ArquivoRemessaItau
+from opencnab.bancos.itau.cnab_400.modelos import BoletoItauCobranca
+
+remessa = ArquivoRemessaItau(
+    agencia="1234",
+    conta="56789",
+    carteira="109",
+    documento_empresa="12.345.678/0001-95",
+    nome_empresa="MINHA EMPRESA LTDA",
+    data_geracao=date(2026, 8, 10),
+    sequencial_remessa=1
+)
+
+remessa.adicionar_boleto(BoletoItauCobranca(
+    numero_documento="NF001",
+    nosso_numero="12345678",
+    valor=1250.55,
+    vencimento=date(2026, 9, 15),
+    data_emissao=date(2026, 8, 10),
+    nome_pagador="José Antônio da Silva",
+    documento_pagador="123.456.789-01"
+))
+
+remessa.salvar("remessa.rem")
+```
+
+A leitura do retorno segue a mesma interface do BMP, com a tabela de ocorrências
+do Itaú já traduzida:
+
+```python
+from opencnab.bancos.itau.cnab_400.retorno import ler_arquivo_retorno
+
+retorno = ler_arquivo_retorno("retorno.ret")
+
+for titulo in retorno.pagos():
+    print(titulo.nosso_numero, titulo.valor_pago, titulo.data_credito)
+```
+
+O layout do Itaú segue o manual oficial de cobrança em 400 posições. Vale saber
+que o nosso número aparece em três posições diferentes do arquivo de retorno; a
+biblioteca lê a que vem acompanhada do dígito verificador.
+
 ## Gerando o código de barras e a linha digitável
 
 O que o cliente enxerga no boleto: o código de barras que o caixa lê e a linha
@@ -180,6 +230,7 @@ o nosso número e outro para a conta, ambos em módulo 10. A biblioteca cuida di
 - Leitura do arquivo de retorno, com códigos de ocorrência traduzidos
 - Código de barras de 44 posições e linha digitável de 47, no padrão FEBRABAN
 - Campo livre do boleto do Itaú, com os dois dígitos verificadores que ele exige
+- Remessa e retorno do Itaú conforme o manual oficial de 400 posições
 - Fator de vencimento com suporte aos dois ciclos (antes e depois de 22/02/2025)
 - Separação automática dos títulos liquidados, para baixa no contas a receber
 - Valores monetários com `Decimal`, sem perder centavos por arredondamento
@@ -194,7 +245,7 @@ o nosso número e outro para a conta, ambos em módulo 10. A biblioteca cuida di
 | Banco | Código | Remessa CNAB 400 | Retorno CNAB 400 | Boleto |
 |---|---|---|---|---|
 | BMP Money Plus | 274 | Sim | Sim | Genérico |
-| Itaú | 341 | Não | Não | Sim |
+| Itaú | 341 | Sim | Sim | Sim |
 
 O layout CNAB 400 usado segue o padrão de mercado derivado do Bradesco (CBR643),
 que é adotado por vários bancos médios. Isso facilita adicionar novos bancos:
@@ -209,8 +260,8 @@ precisa montar o campo livre das 25 posições conforme o manual do seu banco.
 - [x] Leitura do arquivo de retorno, para baixa automática de contas a receber
 - [x] Código de barras e linha digitável do boleto
 - [x] Campo livre do boleto do Itaú
+- [x] Remessa e retorno do Itaú em CNAB 400
 - [ ] Publicação no PyPI (`pip install opencnab`)
-- [ ] Remessa e retorno do Itaú em CNAB 400
 - [ ] Suporte a CNAB 240
 - [ ] Novos bancos: Bradesco, Santander, Banco do Brasil, Caixa, Sicoob, Inter
 
@@ -247,6 +298,14 @@ Vale conhecer os limites atuais antes de colocar em produção:
   letra `P` em um dos casos.
 - Ao ler o retorno, confira o total recebido contra o extrato na primeira vez,
   para garantir que as posições batem com o arquivo do seu banco.
+- O layout do Itaú foi escrito a partir do manual oficial de cobrança em 400
+  posições e é conferido posição a posição nos testes, mas ainda não foi validado
+  contra um arquivo processado pelo banco de verdade. Faça um envio de teste
+  antes de usar em produção.
+- Na remessa do Itaú, os campos de instrução, juros, desconto, abatimento e
+  endereço do pagador vão zerados ou em branco. Dá para registrar o título e
+  conciliar o pagamento, mas ainda não dá para instruir protesto nem cobrar juros
+  pelo arquivo.
 
 ## Glossário rápido
 
