@@ -261,7 +261,6 @@ precisa montar o campo livre das 25 posições conforme o manual do seu banco.
 - [x] Código de barras e linha digitável do boleto
 - [x] Campo livre do boleto do Itaú
 - [x] Remessa e retorno do Itaú em CNAB 400
-- [ ] Publicação no PyPI (`pip install opencnab`)
 - [ ] Suporte a CNAB 240
 - [ ] Novos bancos: Bradesco, Santander, Banco do Brasil, Caixa, Sicoob, Inter
 
