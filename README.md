@@ -11,10 +11,27 @@ boleto registration and payment reconciliation.*
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
-![Testes](https://img.shields.io/badge/testes-247%20passando-brightgreen)
+![Testes](https://img.shields.io/badge/testes-249%20passando-brightgreen)
 ![Dependências](https://img.shields.io/badge/depend%C3%AAncias-nenhuma-lightgrey)
 
 ---
+
+> ### Atenção para quem já usa o BMP: a remessa mudou na 0.8.0
+>
+> O registro de detalhe do BMP gravava os campos **uma posição à frente** do que
+> o layout CNAB 400 define, a partir da posição 083. A ocorrência ia em 110-111
+> em vez de 109-110, e o mesmo deslocamento atingia número do documento,
+> vencimento, valor, tipo de inscrição, CPF/CNPJ e nome do pagador.
+>
+> A partir da `0.8.0` o registro segue o manual, conferido campo a campo nos
+> testes. Se você gerava remessa com uma versão anterior e o banco aceitava,
+> **confirme com ele antes de enviar o primeiro arquivo novo**, porque o
+> conteúdo das linhas mudou.
+>
+> Na mesma versão, `BoletoBMP` ganhou campos opcionais (espécie, aceite, data de
+> emissão, endereço do pagador, entre outros) e `RegistroTipo1BMP` passou a
+> receber o boleto inteiro em vez de campo a campo. Quem usava
+> `ArquivoRemessaBMP` não precisa mudar nada.
 
 ## Por que este projeto existe
 
