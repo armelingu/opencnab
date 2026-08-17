@@ -5,6 +5,8 @@ from opencnab.nucleo.campos import zeros
 from opencnab.nucleo.datas import data_cnab
 from opencnab.bancos.itau.boleto import calcular_dac_conta
 from opencnab.bancos.itau.cnab_400.registros import RegistroTipo1Itau
+from opencnab.bancos.itau.cnab_400.modelos import BoletoItauCobranca
+from opencnab.bancos.itau.cnab_400 import ocorrencias
 
 CODIGO_BANCO = "341"
 
@@ -73,9 +75,32 @@ class TrailerRemessaItau:
         return linha
 
 
+# um comando e um registro sobre titulo que o banco ja conhece, entao vai sem
+# os dados do pagador: o manual manda zerar tudo que nao muda e o banco acha o
+# titulo pelo nosso numero
+# especie e aceite tambem vao zerados e em branco porque so valem no registro
+# que cria o titulo
+def montar_comando(ocorrencia, nosso_numero, valor, numero_documento="", vencimento=None):
+    comando = BoletoItauCobranca(
+        numero_documento=numero_documento,
+        nosso_numero=nosso_numero,
+        valor=valor,
+        vencimento=vencimento,
+        data_emissao=None,
+        nome_pagador="",
+        documento_pagador="",
+        especie="00",
+        aceite="",
+        ocorrencia=ocorrencia
+    )
+
+    return comando
+
+
 # monta o arquivo de remessa inteiro
-# a ordem e sempre header, um registro tipo 1 por boleto e o trailer
+# a ordem e sempre header, um registro tipo 1 por titulo e o trailer
 # o sequencial comeca em 1 no header e vai somando ate o trailer
+# o mesmo arquivo leva titulos novos e comandos sobre titulos ja registrados
 class ArquivoRemessaItau:
 
     def __init__(self, agencia, conta, carteira, documento_empresa, nome_empresa, data_geracao, sequencial_remessa):
@@ -90,6 +115,66 @@ class ArquivoRemessaItau:
 
     def adicionar_boleto(self, boleto):
         self.boletos.append(boleto)
+
+    # pede ao banco para baixar o titulo, que e como se cancela um boleto ja
+    # registrado. o banco para de cobrar e o titulo sai da carteira
+    def pedir_baixa(self, nosso_numero, valor, numero_documento=""):
+        comando = montar_comando(ocorrencias.PEDIDO_DE_BAIXA, nosso_numero, valor, numero_documento)
+        self.boletos.append(comando)
+
+        return comando
+
+    # usado quando o pagador ja pagou direto para a empresa e o boleto no banco
+    # precisa ser baixado para nao continuar sendo cobrado
+    def baixar_por_pagamento_direto(self, nosso_numero, valor, numero_documento=""):
+        comando = montar_comando(ocorrencias.BAIXA_POR_PAGAMENTO_DIRETO, nosso_numero, valor, numero_documento)
+        self.boletos.append(comando)
+
+        return comando
+
+    # prorroga o titulo, o caso de quem pede mais prazo para pagar
+    def alterar_vencimento(self, nosso_numero, valor, novo_vencimento, numero_documento=""):
+        comando = montar_comando(ocorrencias.ALTERACAO_DE_VENCIMENTO, nosso_numero, valor, numero_documento, novo_vencimento)
+        self.boletos.append(comando)
+
+        return comando
+
+    # manda protestar um titulo vencido
+    # o prazo em dias conta a partir do vencimento; com zero o Itau protesta
+    # dois dias corridos depois de vencer
+    def mandar_protestar(self, nosso_numero, valor, dias=0, numero_documento=""):
+        comando = montar_comando(ocorrencias.PROTESTAR, nosso_numero, valor, numero_documento)
+        comando.dias_da_instrucao = dias
+        self.boletos.append(comando)
+
+        return comando
+
+    def sustar_protesto(self, nosso_numero, valor, numero_documento=""):
+        comando = montar_comando(ocorrencias.SUSTAR_PROTESTO, nosso_numero, valor, numero_documento)
+        self.boletos.append(comando)
+
+        return comando
+
+    # abatimento e um desconto concedido depois que o titulo ja foi registrado
+    def conceder_abatimento(self, nosso_numero, valor, valor_abatimento, numero_documento=""):
+        comando = montar_comando(ocorrencias.CONCESSAO_DE_ABATIMENTO, nosso_numero, valor, numero_documento)
+        comando.valor_abatimento = valor_abatimento
+        self.boletos.append(comando)
+
+        return comando
+
+    def cancelar_abatimento(self, nosso_numero, valor, valor_abatimento, numero_documento=""):
+        comando = montar_comando(ocorrencias.CANCELAMENTO_DE_ABATIMENTO, nosso_numero, valor, numero_documento)
+        comando.valor_abatimento = valor_abatimento
+        self.boletos.append(comando)
+
+        return comando
+
+    def dispensar_juros(self, nosso_numero, valor, numero_documento=""):
+        comando = montar_comando(ocorrencias.DISPENSA_DE_JUROS, nosso_numero, valor, numero_documento)
+        self.boletos.append(comando)
+
+        return comando
 
     def gerar(self):
         if len(self.boletos) == 0:

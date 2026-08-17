@@ -8,6 +8,8 @@ from opencnab.bancos.bmp.cnab_400.retorno import ArquivoRetornoBMP
 from opencnab.bancos.bmp.cnab_400.retorno import ler_arquivo_retorno as ler_retorno_bmp
 
 from opencnab.bancos.itau.boleto import BoletoItau
+from opencnab.bancos.itau.cnab_400 import instrucoes as instrucoes_itau
+from opencnab.bancos.itau.cnab_400 import ocorrencias as ocorrencias_itau
 from opencnab.bancos.itau.cnab_400.modelos import BoletoItauCobranca
 from opencnab.bancos.itau.cnab_400.modelos import EnderecoPagador
 from opencnab.bancos.itau.cnab_400.remessa import ArquivoRemessaItau
@@ -24,6 +26,8 @@ __all__ = [
     "ArquivoRetornoBMP",
     "ler_retorno_bmp",
     "BoletoItau",
+    "instrucoes_itau",
+    "ocorrencias_itau",
     "BoletoItauCobranca",
     "EnderecoPagador",
     "ArquivoRemessaItau",
