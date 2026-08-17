@@ -9,13 +9,6 @@ from opencnab.nucleo.validacoes import tipo_inscricao_ou_zeros
 from opencnab.bancos.bmp.cnab_400.nosso_numero import gerar_nosso_numero
 from opencnab.bancos.bmp.cnab_400 import ocorrencias
 
-# 2 = quem emite o boleto e o cliente e o banco so processa o registro,
-# que e o caso de quem usa esta biblioteca para gerar o boleto
-CONDICAO_EMISSAO_PELO_CLIENTE = "2"
-
-# N = nao registra para debito automatico
-SEM_DEBITO_AUTOMATICO = "N"
-
 
 # so o titulo novo precisa dos dados completos
 # o comando vai sobre um titulo que o banco ja tem, entao identifica pelo
@@ -54,8 +47,8 @@ class RegistroTipo1BMP:
         campos.append(numerico(nosso_numero_base, 11))                           #071-081 nosso numero
         campos.append(numerico(digito_nosso_numero, 1))                          #082-082 digito do nosso numero
         campos.append(zeros(10))                                                 #083-092 desconto bonificacao por dia
-        campos.append(alfa(CONDICAO_EMISSAO_PELO_CLIENTE, 1))                    #093-093 condicao de emissao do boleto
-        campos.append(alfa(SEM_DEBITO_AUTOMATICO, 1))                            #094-094 emissao de boleto para debito automatico
+        campos.append(alfa(self.boleto.condicao_emissao, 1))                     #093-093 condicao de emissao do boleto
+        campos.append(alfa(self.boleto.debito_automatico, 1))                    #094-094 emissao de boleto para debito automatico
         campos.append(branco(10))                                                #095-104 uso do banco
         campos.append(branco(1))                                                 #105-105 indicador de rateio de credito
         campos.append(branco(1))                                                 #106-106 endereco para aviso de debito automatico

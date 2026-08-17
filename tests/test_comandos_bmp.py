@@ -159,6 +159,28 @@ def test_comando_vai_sem_especie_e_sem_aceite():
     assert resultado[149:150] == " "
 
 
+# condicao de emissao e debito automatico descrevem o boleto que esta sendo
+# criado, entao no comando vao em branco
+def test_comando_vai_sem_condicao_de_emissao():
+    remessa = criar_remessa()
+    remessa.pedir_baixa(nosso_numero="2", valor=500.00)
+
+    resultado = primeiro_detalhe(remessa)
+
+    assert resultado[92:93] == " "
+    assert resultado[93:94] == " "
+
+
+def test_titulo_novo_mantem_condicao_de_emissao():
+    remessa = criar_remessa()
+    remessa.adicionar_boleto(criar_boleto())
+
+    resultado = primeiro_detalhe(remessa)
+
+    assert resultado[92:93] == "2"
+    assert resultado[93:94] == "N"
+
+
 def test_comando_tem_400_posicoes():
     remessa = criar_remessa()
     remessa.pedir_baixa(nosso_numero="2", valor=500.00)

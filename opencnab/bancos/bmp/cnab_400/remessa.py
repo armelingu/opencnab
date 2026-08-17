@@ -71,6 +71,8 @@ def montar_comando(ocorrencia, nosso_numero, valor, numero_documento="", vencime
         documento_pagador="",
         especie="0",
         aceite="",
+        condicao_emissao="",
+        debito_automatico="",
         ocorrencia=ocorrencia
     )
 
