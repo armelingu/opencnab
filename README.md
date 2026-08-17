@@ -11,7 +11,7 @@ boleto registration and payment reconciliation.*
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
-![Testes](https://img.shields.io/badge/testes-190%20passando-brightgreen)
+![Testes](https://img.shields.io/badge/testes-194%20passando-brightgreen)
 ![Dependências](https://img.shields.io/badge/depend%C3%AAncias-nenhuma-lightgrey)
 
 ---
@@ -52,8 +52,8 @@ Gerar um arquivo de remessa completo, pronto para enviar ao banco:
 
 ```python
 from datetime import date
-from opencnab.bancos.bmp.cnab_400.remessa import ArquivoRemessaBMP
-from opencnab.bancos.bmp.cnab_400.modelos import BoletoBMP
+from opencnab import ArquivoRemessaBMP
+from opencnab import BoletoBMP
 
 remessa = ArquivoRemessaBMP(
     codigo_empresa="123",
@@ -95,9 +95,9 @@ O retorno é o arquivo que o banco devolve informando o que aconteceu com cada
 título. É com ele que você dá baixa automática no contas a receber:
 
 ```python
-from opencnab.bancos.bmp.cnab_400.retorno import ler_arquivo_retorno
+from opencnab import ler_retorno_bmp
 
-retorno = ler_arquivo_retorno("retorno.ret")
+retorno = ler_retorno_bmp("retorno.ret")
 
 for titulo in retorno.pagos():
     print(titulo.nosso_numero, titulo.numero_documento, titulo.valor_pago)
@@ -128,8 +128,8 @@ automaticamente:
 
 ```python
 from datetime import date
-from opencnab.bancos.itau.cnab_400.remessa import ArquivoRemessaItau
-from opencnab.bancos.itau.cnab_400.modelos import BoletoItauCobranca
+from opencnab import ArquivoRemessaItau
+from opencnab import BoletoItauCobranca
 
 remessa = ArquivoRemessaItau(
     agencia="1234",
@@ -158,9 +158,9 @@ A leitura do retorno segue a mesma interface do BMP, com a tabela de ocorrência
 do Itaú já traduzida:
 
 ```python
-from opencnab.bancos.itau.cnab_400.retorno import ler_arquivo_retorno
+from opencnab import ler_retorno_itau
 
-retorno = ler_arquivo_retorno("retorno.ret")
+retorno = ler_retorno_itau("retorno.ret")
 
 for titulo in retorno.pagos():
     print(titulo.nosso_numero, titulo.valor_pago, titulo.data_credito)
@@ -178,9 +178,9 @@ preencher os campos opcionais do título:
 
 ```python
 from datetime import date
+from opencnab import BoletoItauCobranca
+from opencnab import EnderecoPagador
 from opencnab.bancos.itau.cnab_400 import instrucoes
-from opencnab.bancos.itau.cnab_400.modelos import BoletoItauCobranca
-from opencnab.bancos.itau.cnab_400.modelos import EnderecoPagador
 
 boleto = BoletoItauCobranca(
     numero_documento="NF001",
@@ -229,9 +229,9 @@ digitável que ele digita quando o leitor falha.
 
 ```python
 from datetime import date
-from opencnab.boletos.codigo_barras import gerar_codigo_barras
-from opencnab.boletos.linha_digitavel import gerar_linha_digitavel
-from opencnab.boletos.linha_digitavel import formatar_linha_digitavel
+from opencnab import gerar_codigo_barras
+from opencnab import gerar_linha_digitavel
+from opencnab import formatar_linha_digitavel
 
 codigo = gerar_codigo_barras(
     codigo_banco="274",
@@ -258,7 +258,7 @@ Para os bancos já implementados você não precisa montar o campo livre na mão
 
 ```python
 from datetime import date
-from opencnab.bancos.itau.boleto import BoletoItau
+from opencnab import BoletoItau
 
 boleto = BoletoItau(
     agencia="1234",
