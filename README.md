@@ -11,7 +11,7 @@ boleto registration and payment reconciliation.*
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
-![Testes](https://img.shields.io/badge/testes-190%20passando-brightgreen)
+![Testes](https://img.shields.io/badge/testes-223%20passando-brightgreen)
 ![Dependências](https://img.shields.io/badge/depend%C3%AAncias-nenhuma-lightgrey)
 
 ---
@@ -52,8 +52,8 @@ Gerar um arquivo de remessa completo, pronto para enviar ao banco:
 
 ```python
 from datetime import date
-from opencnab.bancos.bmp.cnab_400.remessa import ArquivoRemessaBMP
-from opencnab.bancos.bmp.cnab_400.modelos import BoletoBMP
+from opencnab import ArquivoRemessaBMP
+from opencnab import BoletoBMP
 
 remessa = ArquivoRemessaBMP(
     codigo_empresa="123",
@@ -95,9 +95,9 @@ O retorno é o arquivo que o banco devolve informando o que aconteceu com cada
 título. É com ele que você dá baixa automática no contas a receber:
 
 ```python
-from opencnab.bancos.bmp.cnab_400.retorno import ler_arquivo_retorno
+from opencnab import ler_retorno_bmp
 
-retorno = ler_arquivo_retorno("retorno.ret")
+retorno = ler_retorno_bmp("retorno.ret")
 
 for titulo in retorno.pagos():
     print(titulo.nosso_numero, titulo.numero_documento, titulo.valor_pago)
@@ -128,8 +128,8 @@ automaticamente:
 
 ```python
 from datetime import date
-from opencnab.bancos.itau.cnab_400.remessa import ArquivoRemessaItau
-from opencnab.bancos.itau.cnab_400.modelos import BoletoItauCobranca
+from opencnab import ArquivoRemessaItau
+from opencnab import BoletoItauCobranca
 
 remessa = ArquivoRemessaItau(
     agencia="1234",
@@ -158,9 +158,9 @@ A leitura do retorno segue a mesma interface do BMP, com a tabela de ocorrência
 do Itaú já traduzida:
 
 ```python
-from opencnab.bancos.itau.cnab_400.retorno import ler_arquivo_retorno
+from opencnab import ler_retorno_itau
 
-retorno = ler_arquivo_retorno("retorno.ret")
+retorno = ler_retorno_itau("retorno.ret")
 
 for titulo in retorno.pagos():
     print(titulo.nosso_numero, titulo.valor_pago, titulo.data_credito)
@@ -178,9 +178,9 @@ preencher os campos opcionais do título:
 
 ```python
 from datetime import date
+from opencnab import BoletoItauCobranca
+from opencnab import EnderecoPagador
 from opencnab.bancos.itau.cnab_400 import instrucoes
-from opencnab.bancos.itau.cnab_400.modelos import BoletoItauCobranca
-from opencnab.bancos.itau.cnab_400.modelos import EnderecoPagador
 
 boleto = BoletoItauCobranca(
     numero_documento="NF001",
@@ -222,6 +222,52 @@ A biblioteca recusa três combinações que o banco rejeitaria ou entenderia
 errado: instrução com prazo sem informar a quantidade de dias, protestar e não
 protestar no mesmo título, e desconto sem a data limite para concedê-lo.
 
+### Cancelando, prorrogando e protestando
+
+Registrar o boleto é só o começo. Depois vem o cliente que pede mais prazo, a
+nota emitida errada que precisa ser cancelada e o título que venceu e não foi
+pago. Tudo isso é comandado pelo mesmo arquivo de remessa, mudando a ocorrência
+do registro.
+
+O banco encontra o título pelo **nosso número**, então é só ele e o valor que
+você precisa informar:
+
+```python
+remessa = ArquivoRemessaItau(...)
+
+# cancelar um boleto: o banco baixa o título e para de cobrar
+remessa.pedir_baixa(nosso_numero="11111111", valor=500.00)
+
+# o cliente pagou direto na sua conta, então o boleto no banco não faz mais sentido
+remessa.baixar_por_pagamento_direto(nosso_numero="22222222", valor=800.00)
+
+# prorrogar para quem pediu mais prazo
+remessa.alterar_vencimento(
+    nosso_numero="33333333",
+    valor=990.00,
+    novo_vencimento=date(2026, 10, 30)
+)
+
+# protestar 10 dias depois do vencimento, e sustar o protesto se ele pagar
+remessa.mandar_protestar(nosso_numero="44444444", valor=700.00, dias=10)
+remessa.sustar_protesto(nosso_numero="44444444", valor=700.00)
+
+# conceder um desconto depois que o título já foi registrado
+remessa.conceder_abatimento(nosso_numero="55555555", valor=300.00, valor_abatimento=30.00)
+remessa.dispensar_juros(nosso_numero="55555555", valor=300.00)
+
+remessa.salvar("remessa.rem")
+```
+
+Títulos novos e comandos convivem no mesmo arquivo, na ordem em que você os
+adiciona. Os códigos de ocorrência ficam em
+`opencnab/bancos/itau/cnab_400/ocorrencias.py`.
+
+Duas observações do manual que valem lembrar: no protesto, `dias=0` faz o Itaú
+protestar dois dias corridos após o vencimento; e um comando só é aceito antes
+de o protesto começar — se já estiver em andamento, suste primeiro e comande
+depois, o que pode ir no mesmo arquivo.
+
 ## Gerando o código de barras e a linha digitável
 
 O que o cliente enxerga no boleto: o código de barras que o caixa lê e a linha
@@ -229,9 +275,9 @@ digitável que ele digita quando o leitor falha.
 
 ```python
 from datetime import date
-from opencnab.boletos.codigo_barras import gerar_codigo_barras
-from opencnab.boletos.linha_digitavel import gerar_linha_digitavel
-from opencnab.boletos.linha_digitavel import formatar_linha_digitavel
+from opencnab import gerar_codigo_barras
+from opencnab import gerar_linha_digitavel
+from opencnab import formatar_linha_digitavel
 
 codigo = gerar_codigo_barras(
     codigo_banco="274",
@@ -258,7 +304,7 @@ Para os bancos já implementados você não precisa montar o campo livre na mão
 
 ```python
 from datetime import date
-from opencnab.bancos.itau.boleto import BoletoItau
+from opencnab import BoletoItau
 
 boleto = BoletoItau(
     agencia="1234",
@@ -284,6 +330,7 @@ o nosso número e outro para a conta, ambos em módulo 10. A biblioteca cuida di
 - Campo livre do boleto do Itaú, com os dois dígitos verificadores que ele exige
 - Remessa e retorno do Itaú conforme o manual oficial de 400 posições
 - Instruções de protesto, juros de atraso, desconto e abatimento no Itaú
+- Baixa, prorrogação, protesto e abatimento de títulos já registrados no Itaú
 - Endereço do pagador, usado pelo Itaú para definir a agência cobradora
 - Fator de vencimento com suporte aos dois ciclos (antes e depois de 22/02/2025)
 - Separação automática dos títulos liquidados, para baixa no contas a receber
@@ -315,6 +362,7 @@ precisa montar o campo livre das 25 posições conforme o manual do seu banco.
 - [x] Código de barras e linha digitável do boleto
 - [x] Campo livre do boleto do Itaú
 - [x] Remessa e retorno do Itaú em CNAB 400
+- [x] Comandos de baixa, prorrogação e protesto sobre títulos já registrados
 - [ ] Suporte a CNAB 240
 - [ ] Novos bancos: Bradesco, Santander, Banco do Brasil, Caixa, Sicoob, Inter
 

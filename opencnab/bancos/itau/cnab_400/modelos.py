@@ -1,4 +1,5 @@
 from opencnab.bancos.itau.cnab_400 import instrucoes
+from opencnab.bancos.itau.cnab_400 import ocorrencias
 
 
 # endereco do pagador, que vai nas posicoes 275 a 351 do registro de detalhe
@@ -21,7 +22,7 @@ class EnderecoPagador:
 # titulo e registrado do jeito mais simples, so com a cobranca
 class BoletoItauCobranca:
 
-    def __init__(self, numero_documento, nosso_numero, valor, vencimento, data_emissao, nome_pagador, documento_pagador, especie="01", aceite="N", uso_da_empresa="", endereco_pagador=None, juros_por_dia=0, data_mora=None, valor_desconto=0, desconto_ate=None, valor_abatimento=0, valor_iof=0, instrucao_1=instrucoes.SEM_INSTRUCAO, instrucao_2=instrucoes.SEM_INSTRUCAO, dias_da_instrucao=0, sacador_avalista=""):
+    def __init__(self, numero_documento, nosso_numero, valor, vencimento, data_emissao, nome_pagador, documento_pagador, especie="01", aceite="N", uso_da_empresa="", endereco_pagador=None, juros_por_dia=0, data_mora=None, valor_desconto=0, desconto_ate=None, valor_abatimento=0, valor_iof=0, instrucao_1=instrucoes.SEM_INSTRUCAO, instrucao_2=instrucoes.SEM_INSTRUCAO, dias_da_instrucao=0, sacador_avalista="", ocorrencia=ocorrencias.ENTRADA):
         self.numero_documento = numero_documento
         self.nosso_numero = nosso_numero
         self.valor = valor
@@ -43,3 +44,4 @@ class BoletoItauCobranca:
         self.instrucao_2 = instrucao_2
         self.dias_da_instrucao = dias_da_instrucao
         self.sacador_avalista = sacador_avalista
+        self.ocorrencia = ocorrencia
