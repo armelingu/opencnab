@@ -23,3 +23,14 @@ def tipo_inscricao(documento):
         return "02"
 
     raise Exception("Documento precisa ter 11 digitos para CPF ou 14 para CNPJ")
+
+
+# nos comandos enviados sobre um titulo que ja esta registrado o banco nao
+# pede os dados do pagador, e o layout manda preencher o campo com zeros
+def tipo_inscricao_ou_zeros(documento):
+    documento_limpo = somente_numeros(documento)
+
+    if documento_limpo == "":
+        return "00"
+
+    return tipo_inscricao(documento)
