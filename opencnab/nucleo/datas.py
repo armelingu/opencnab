@@ -7,6 +7,20 @@ def data_cnab(data):
     return data_texto
 
 
+# varios campos de data sao opcionais e o layout manda zerar quando nao se
+# aplicam, como a data de desconto de um titulo que nao tem desconto
+def data_ou_zeros(data, tamanho=6):
+    if data is None:
+        zerado = ""
+
+        for _ in range(tamanho):
+            zerado += "0"
+
+        return zerado
+
+    return data_cnab(data)
+
+
 # caminho contrario do data_cnab, usado na leitura do retorno
 # 1. o banco manda a data como 000000 quando o campo nao se aplica
 # 2. o ano vem com dois digitos e o CNAB trata todos como 20xx

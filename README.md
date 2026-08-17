@@ -11,10 +11,27 @@ boleto registration and payment reconciliation.*
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
-![Testes](https://img.shields.io/badge/testes-223%20passando-brightgreen)
+![Testes](https://img.shields.io/badge/testes-249%20passando-brightgreen)
 ![Dependências](https://img.shields.io/badge/depend%C3%AAncias-nenhuma-lightgrey)
 
 ---
+
+> ### Atenção para quem já usa o BMP: a remessa mudou na 0.8.0
+>
+> O registro de detalhe do BMP gravava os campos **uma posição à frente** do que
+> o layout CNAB 400 define, a partir da posição 083. A ocorrência ia em 110-111
+> em vez de 109-110, e o mesmo deslocamento atingia número do documento,
+> vencimento, valor, tipo de inscrição, CPF/CNPJ e nome do pagador.
+>
+> A partir da `0.8.0` o registro segue o manual, conferido campo a campo nos
+> testes. Se você gerava remessa com uma versão anterior e o banco aceitava,
+> **confirme com ele antes de enviar o primeiro arquivo novo**, porque o
+> conteúdo das linhas mudou.
+>
+> Na mesma versão, `BoletoBMP` ganhou campos opcionais (espécie, aceite, data de
+> emissão, endereço do pagador, entre outros) e `RegistroTipo1BMP` passou a
+> receber o boleto inteiro em vez de campo a campo. Quem usava
+> `ArquivoRemessaBMP` não precisa mudar nada.
 
 ## Por que este projeto existe
 
@@ -88,6 +105,20 @@ cabeçalho e o trailer, numera o sequencial de cada linha, identifica
 automaticamente se o pagador é CPF ou CNPJ, remove acentos dos nomes, formata
 datas e valores no padrão CNAB e garante que toda linha tenha exatamente 400
 posições.
+
+Para mexer em um boleto que já foi registrado, use os comandos da remessa. O
+banco encontra o título pelo **nosso número**:
+
+```python
+remessa.pedir_baixa(nosso_numero="2", valor=500.00)
+remessa.alterar_vencimento(nosso_numero="3", valor=800.00, novo_vencimento=date(2026, 10, 30))
+remessa.alterar_valor(nosso_numero="3", novo_valor=999.99)
+remessa.mandar_protestar(nosso_numero="4", valor=990.00)
+remessa.sustar_protesto_e_baixar(nosso_numero="4", valor=990.00)
+remessa.sustar_protesto_e_manter(nosso_numero="4", valor=990.00)
+remessa.conceder_abatimento(nosso_numero="5", valor=700.00, valor_abatimento=70.00)
+remessa.cancelar_abatimento(nosso_numero="5", valor=700.00, valor_abatimento=70.00)
+```
 
 ## Lendo o retorno do banco
 
@@ -330,7 +361,7 @@ o nosso número e outro para a conta, ambos em módulo 10. A biblioteca cuida di
 - Campo livre do boleto do Itaú, com os dois dígitos verificadores que ele exige
 - Remessa e retorno do Itaú conforme o manual oficial de 400 posições
 - Instruções de protesto, juros de atraso, desconto e abatimento no Itaú
-- Baixa, prorrogação, protesto e abatimento de títulos já registrados no Itaú
+- Baixa, prorrogação, protesto e abatimento de títulos já registrados, nos dois bancos
 - Endereço do pagador, usado pelo Itaú para definir a agência cobradora
 - Fator de vencimento com suporte aos dois ciclos (antes e depois de 22/02/2025)
 - Separação automática dos títulos liquidados, para baixa no contas a receber
@@ -363,6 +394,7 @@ precisa montar o campo livre das 25 posições conforme o manual do seu banco.
 - [x] Campo livre do boleto do Itaú
 - [x] Remessa e retorno do Itaú em CNAB 400
 - [x] Comandos de baixa, prorrogação e protesto sobre títulos já registrados
+- [x] Registro de detalhe do BMP conferido posição a posição contra o manual
 - [ ] Suporte a CNAB 240
 - [ ] Novos bancos: Bradesco, Santander, Banco do Brasil, Caixa, Sicoob, Inter
 
@@ -393,6 +425,9 @@ Vale conhecer os limites atuais antes de colocar em produção:
 - As posições do CNAB 400 seguem o layout de mercado derivado do Bradesco
   (CBR643), que o cabeçalho do BMP reproduz. Convém conferir contra o manual
   oficial do seu banco antes do primeiro envio.
+- No registro de detalhe do BMP, as posições de 002 a 070 continuam em branco.
+  Aí ficam campos como a identificação da empresa no banco, que alguns bancos
+  exigem além do que já vai no cabeçalho. Confira com o seu antes de enviar.
 - Fora o Itaú, o campo livre do código de barras precisa ser montado por você,
   porque cada banco define as 25 posições de um jeito.
 - O dígito do "nosso número" usa a regra que devolve `0`; alguns bancos usam a
