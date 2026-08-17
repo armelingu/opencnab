@@ -11,7 +11,7 @@ boleto registration and payment reconciliation.*
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
-![Testes](https://img.shields.io/badge/testes-165%20passando-brightgreen)
+![Testes](https://img.shields.io/badge/testes-190%20passando-brightgreen)
 ![Dependências](https://img.shields.io/badge/depend%C3%AAncias-nenhuma-lightgrey)
 
 ---
@@ -170,6 +170,58 @@ O layout do Itaú segue o manual oficial de cobrança em 400 posições. Vale sa
 que o nosso número aparece em três posições diferentes do arquivo de retorno; a
 biblioteca lê a que vem acompanhada do dígito verificador.
 
+### Instruções, juros, desconto e endereço
+
+O exemplo acima registra a cobrança do jeito mais simples. Quando você precisa
+mandar o banco protestar, cobrar juros de atraso ou conceder desconto, é só
+preencher os campos opcionais do título:
+
+```python
+from datetime import date
+from opencnab.bancos.itau.cnab_400 import instrucoes
+from opencnab.bancos.itau.cnab_400.modelos import BoletoItauCobranca
+from opencnab.bancos.itau.cnab_400.modelos import EnderecoPagador
+
+boleto = BoletoItauCobranca(
+    numero_documento="NF001",
+    nosso_numero="12345678",
+    valor=1250.55,
+    vencimento=date(2026, 9, 15),
+    data_emissao=date(2026, 8, 10),
+    nome_pagador="José Antônio da Silva",
+    documento_pagador="123.456.789-01",
+
+    endereco_pagador=EnderecoPagador(
+        logradouro="Rua das Flores, 123",
+        bairro="Centro",
+        cep="01310-100",
+        cidade="São Paulo",
+        uf="SP"
+    ),
+
+    juros_por_dia=0.42,
+    data_mora=date(2026, 9, 16),
+
+    valor_desconto=50.00,
+    desconto_ate=date(2026, 9, 10),
+
+    instrucao_1=instrucoes.PROTESTAR_DIAS_CORRIDOS,
+    dias_da_instrucao=15
+)
+```
+
+As instruções têm nome em vez de código solto, então você escreve
+`instrucoes.PROTESTAR_DIAS_CORRIDOS` e não `"34"`. A lista completa está em
+`opencnab/bancos/itau/cnab_400/instrucoes.py`.
+
+Vale preencher o endereço mesmo sendo opcional: **é pelo CEP do pagador que o
+Itaú decide qual agência vai cobrar o título**, e é esse endereço que sai
+impresso no boleto.
+
+A biblioteca recusa três combinações que o banco rejeitaria ou entenderia
+errado: instrução com prazo sem informar a quantidade de dias, protestar e não
+protestar no mesmo título, e desconto sem a data limite para concedê-lo.
+
 ## Gerando o código de barras e a linha digitável
 
 O que o cliente enxerga no boleto: o código de barras que o caixa lê e a linha
@@ -231,6 +283,8 @@ o nosso número e outro para a conta, ambos em módulo 10. A biblioteca cuida di
 - Código de barras de 44 posições e linha digitável de 47, no padrão FEBRABAN
 - Campo livre do boleto do Itaú, com os dois dígitos verificadores que ele exige
 - Remessa e retorno do Itaú conforme o manual oficial de 400 posições
+- Instruções de protesto, juros de atraso, desconto e abatimento no Itaú
+- Endereço do pagador, usado pelo Itaú para definir a agência cobradora
 - Fator de vencimento com suporte aos dois ciclos (antes e depois de 22/02/2025)
 - Separação automática dos títulos liquidados, para baixa no contas a receber
 - Valores monetários com `Decimal`, sem perder centavos por arredondamento
@@ -261,7 +315,6 @@ precisa montar o campo livre das 25 posições conforme o manual do seu banco.
 - [x] Código de barras e linha digitável do boleto
 - [x] Campo livre do boleto do Itaú
 - [x] Remessa e retorno do Itaú em CNAB 400
-- [ ] Publicação no PyPI (`pip install opencnab`)
 - [ ] Suporte a CNAB 240
 - [ ] Novos bancos: Bradesco, Santander, Banco do Brasil, Caixa, Sicoob, Inter
 
@@ -302,10 +355,9 @@ Vale conhecer os limites atuais antes de colocar em produção:
   posições e é conferido posição a posição nos testes, mas ainda não foi validado
   contra um arquivo processado pelo banco de verdade. Faça um envio de teste
   antes de usar em produção.
-- Na remessa do Itaú, os campos de instrução, juros, desconto, abatimento e
-  endereço do pagador vão zerados ou em branco. Dá para registrar o título e
-  conciliar o pagamento, mas ainda não dá para instruir protesto nem cobrar juros
-  pelo arquivo.
+- No Itaú, o registro opcional de multa (tipo 2) e o de rateio de crédito
+  (tipo 4) ainda não são gerados. Multa percentual diferente da cadastrada na
+  conta depende desse registro.
 
 ## Glossário rápido
 
