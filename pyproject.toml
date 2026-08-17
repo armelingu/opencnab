@@ -1,6 +1,6 @@
 [project]
 name = "opencnab"
-version = "0.5.0"
+version = "0.6.0"
 description = "Biblioteca Python open source para gerar e ler arquivos CNAB 400 e CNAB 240 de cobranca bancaria"
 readme = "README.md"
 license = "MIT"
