@@ -2,7 +2,7 @@ from opencnab.nucleo.campos import alfa
 from opencnab.nucleo.campos import branco
 from opencnab.nucleo.campos import numerico
 from opencnab.nucleo.campos import zeros
-from opencnab.nucleo.datas import data_cnab
+from opencnab.nucleo.datas import data_ou_zeros
 from opencnab.nucleo.valores import valor_cnab
 from opencnab.nucleo.validacoes import somente_numeros
 from opencnab.nucleo.validacoes import tipo_inscricao
@@ -12,14 +12,6 @@ from opencnab.bancos.itau.cnab_400 import instrucoes
 from opencnab.bancos.itau.cnab_400 import ocorrencias
 
 CODIGO_BANCO = "341"
-
-
-# data que pode nao existir: o layout pede o campo zerado quando nao se aplica
-def data_ou_zeros(data, tamanho=6):
-    if data is None:
-        return zeros(tamanho)
-
-    return data_cnab(data)
 
 
 # confere o que o banco rejeitaria ou entenderia errado

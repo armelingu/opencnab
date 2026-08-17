@@ -82,7 +82,7 @@ class ArquivoRemessaBMP:
 
         for boleto in self.boletos:
             sequencial = sequencial + 1
-            registro = RegistroTipo1BMP(boleto.numero_documento, boleto.nosso_numero, boleto.valor, boleto.vencimento, boleto.nome_pagador, boleto.documento_pagador, sequencial)
+            registro = RegistroTipo1BMP(boleto, sequencial)
             linhas.append(registro.gerar())
 
         sequencial = sequencial + 1
