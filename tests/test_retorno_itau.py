@@ -119,6 +119,29 @@ def test_arquivo_le_os_titulos():
     assert resultado[0].nosso_numero == "12345678"
 
 
+def test_repetir_leitura_nao_duplica_titulos_nem_total_pago():
+    arquivo = ArquivoRetornoItau(montar_arquivo())
+    arquivo.ler()
+
+    resultado = arquivo.ler()
+
+    assert len(resultado) == 1
+    assert len(arquivo.pagos()) == 1
+    assert arquivo.total_pago() == Decimal("1250.55")
+
+
+def test_reler_texto_sem_titulos_limpa_os_titulos_anteriores():
+    arquivo = ArquivoRetornoItau(montar_arquivo())
+    arquivo.ler()
+    arquivo.texto = montar_header() + "\r\n" + montar_trailer()
+
+    resultado = arquivo.ler()
+
+    assert resultado == []
+    assert arquivo.pagos() == []
+    assert arquivo.total_pago() == Decimal("0.00")
+
+
 def test_arquivo_de_remessa_da_erro_na_leitura():
     linha = montar_linha([(1, "0"), (2, "1"), (3, "REMESSA")])
 

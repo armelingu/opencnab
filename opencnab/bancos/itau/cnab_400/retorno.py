@@ -197,6 +197,8 @@ class ArquivoRetornoItau:
         self.titulos = []
 
     def ler(self):
+        # cada leitura monta os titulos de novo, sem somar com a anterior
+        self.titulos = []
         linhas = self.texto.splitlines()
 
         for linha in linhas:
