@@ -30,6 +30,44 @@ def test_valor_cnab_tamanho_personalizado():
     resultado = valor_cnab(150.70, 10)
     assert resultado == "0000015070"
 
+
+def mensagem_de_erro(valor):
+    mensagem = ""
+
+    try:
+        valor_cnab(valor)
+    except Exception as erro:
+        mensagem = str(erro)
+
+    return mensagem
+
+
+def test_valor_cnab_negativo():
+    for valor in [-1, "-150.70", Decimal("-0.01")]:
+        resultado = mensagem_de_erro(valor)
+        assert resultado == "Valor nao pode ser negativo"
+
+
+def test_valor_cnab_negativo_menor_que_um_centavo():
+    resultado = mensagem_de_erro("-0.001")
+    assert resultado == "Valor nao pode ser negativo"
+
+
+def test_valor_cnab_nao_finito():
+    for valor in [float("nan"), float("inf"), float("-inf"), "NaN", "Infinity", "-Infinity", Decimal("sNaN")]:
+        resultado = mensagem_de_erro(valor)
+        assert resultado == "Valor precisa ser finito"
+
+
+def test_valor_cnab_zero_com_sinal_negativo():
+    resultado = valor_cnab(Decimal("-0.00"))
+    assert resultado == "0000000000000"
+
+
+def test_valor_cnab_arredonda_meio_centavo_para_cima():
+    resultado = valor_cnab("1.005")
+    assert resultado == "0000000000101"
+
 def test_valor_de_cnab():
     resultado = valor_de_cnab("0000000015070")
     assert resultado == Decimal("150.70")
