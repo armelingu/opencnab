@@ -129,3 +129,114 @@ def test_registro_tipo1_endereco_do_pagador():
 
     assert linha[274:314] == "RUA DAS FLORES, 123                     "
     assert linha[326:334] == "01310100"
+
+
+def test_registro_tipo1_data_de_emissao():
+    boleto = criar_boleto()
+    boleto.data_emissao = date(2026, 6, 5)
+
+    linha = RegistroTipo1BMP(boleto, sequencial_registro=2).gerar()
+
+    assert linha[150:156] == "050626"
+
+
+def test_registro_tipo1_datas_opcionais_nao_informadas_vao_zeradas():
+    linha = criar_registro().gerar()
+
+    assert linha[150:156] == "000000"
+    assert linha[173:179] == "000000"
+
+
+def test_registro_tipo1_instrucoes_de_cobranca():
+    boleto = criar_boleto()
+    boleto.instrucao_1 = "9"
+    boleto.instrucao_2 = "18"
+
+    linha = RegistroTipo1BMP(boleto, sequencial_registro=2).gerar()
+
+    assert linha[156:158] == "09"
+    assert linha[158:160] == "18"
+
+
+def test_registro_tipo1_juros_por_dia_em_centavos():
+    boleto = criar_boleto()
+    boleto.juros_por_dia = 0.07
+
+    linha = RegistroTipo1BMP(boleto, sequencial_registro=2).gerar()
+
+    assert linha[160:173] == "0000000000007"
+
+
+def test_registro_tipo1_desconto_com_data_limite():
+    boleto = criar_boleto()
+    boleto.desconto_ate = date(2026, 6, 25)
+    boleto.valor_desconto = 10.50
+
+    linha = RegistroTipo1BMP(boleto, sequencial_registro=2).gerar()
+
+    assert linha[173:179] == "250626"
+    assert linha[179:192] == "0000000001050"
+
+
+def test_registro_tipo1_iof_e_abatimento():
+    boleto = criar_boleto()
+    boleto.valor_iof = 2.35
+    boleto.valor_abatimento = 15.70
+
+    linha = RegistroTipo1BMP(boleto, sequencial_registro=2).gerar()
+
+    assert linha[192:205] == "0000000000235"
+    assert linha[205:218] == "0000000001570"
+
+
+def test_registro_tipo1_mensagem_e_avalista_sem_acento():
+    boleto = criar_boleto()
+    boleto.mensagem = "Até amanhã"
+    boleto.sacador_avalista = "José da Conceição"
+
+    linha = RegistroTipo1BMP(boleto, sequencial_registro=2).gerar()
+
+    assert linha[314:326] == "ATE AMANHA  "
+    assert linha[334:394] == "JOSE DA CONCEICAO" + " " * 43
+    linha.encode("ascii")
+
+
+def test_registro_tipo1_textos_opcionais_nao_informados_vao_em_branco():
+    linha = criar_registro().gerar()
+
+    assert linha[314:326] == " " * 12
+    assert linha[334:394] == " " * 60
+
+
+# mesmo preenchendo todos os opcionais, cada campo fica no seu lugar
+# e o sequencial continua nas seis ultimas posicoes
+def test_registro_tipo1_opcionais_juntos_mantem_as_posicoes():
+    boleto = criar_boleto()
+    boleto.data_emissao = date(2026, 6, 5)
+    boleto.instrucao_1 = "9"
+    boleto.instrucao_2 = "18"
+    boleto.juros_por_dia = 0.07
+    boleto.desconto_ate = date(2026, 6, 25)
+    boleto.valor_desconto = 10.50
+    boleto.valor_iof = 2.35
+    boleto.valor_abatimento = 15.70
+    boleto.logradouro_pagador = "Rua São João, 123"
+    boleto.mensagem = "A" * 13
+    boleto.cep_pagador = "01310-100"
+    boleto.sacador_avalista = "B" * 61
+
+    linha = RegistroTipo1BMP(boleto, sequencial_registro=2).gerar()
+
+    assert len(linha) == 400
+    assert linha[150:156] == "050626"
+    assert linha[156:160] == "0918"
+    assert linha[160:173] == "0000000000007"
+    assert linha[173:179] == "250626"
+    assert linha[179:192] == "0000000001050"
+    assert linha[192:205] == "0000000000235"
+    assert linha[205:218] == "0000000001570"
+    assert linha[274:314] == "RUA SAO JOAO, 123" + " " * 23
+    assert linha[314:326] == "A" * 12
+    assert linha[326:334] == "01310100"
+    assert linha[334:394] == "B" * 60
+    assert linha[394:400] == "000002"
