@@ -15,6 +15,16 @@ class EnderecoPagador:
         self.uf = uf
 
 
+# codigo 0 nao registra multa, 1 informa reais e 2 informa percentual
+# a data vai em DDMMAAAA no registro tipo 2, diferente das datas do tipo 1
+class MultaItau:
+
+    def __init__(self, codigo, data, valor):
+        self.codigo = codigo
+        self.data = data
+        self.valor = valor
+
+
 # dados de um titulo que vai na remessa do Itau
 # especie 01 e duplicata mercantil, que e o caso mais comum
 # aceite N quer dizer que o pagador nao assinou aceitando o titulo
@@ -22,7 +32,7 @@ class EnderecoPagador:
 # titulo e registrado do jeito mais simples, so com a cobranca
 class BoletoItauCobranca:
 
-    def __init__(self, numero_documento, nosso_numero, valor, vencimento, data_emissao, nome_pagador, documento_pagador, especie="01", aceite="N", uso_da_empresa="", endereco_pagador=None, juros_por_dia=0, data_mora=None, valor_desconto=0, desconto_ate=None, valor_abatimento=0, valor_iof=0, instrucao_1=instrucoes.SEM_INSTRUCAO, instrucao_2=instrucoes.SEM_INSTRUCAO, dias_da_instrucao=0, sacador_avalista="", ocorrencia=ocorrencias.ENTRADA):
+    def __init__(self, numero_documento, nosso_numero, valor, vencimento, data_emissao, nome_pagador, documento_pagador, especie="01", aceite="N", uso_da_empresa="", endereco_pagador=None, juros_por_dia=0, data_mora=None, valor_desconto=0, desconto_ate=None, valor_abatimento=0, valor_iof=0, instrucao_1=instrucoes.SEM_INSTRUCAO, instrucao_2=instrucoes.SEM_INSTRUCAO, dias_da_instrucao=0, sacador_avalista="", ocorrencia=ocorrencias.ENTRADA, multa=None):
         self.numero_documento = numero_documento
         self.nosso_numero = nosso_numero
         self.valor = valor
@@ -45,3 +55,4 @@ class BoletoItauCobranca:
         self.dias_da_instrucao = dias_da_instrucao
         self.sacador_avalista = sacador_avalista
         self.ocorrencia = ocorrencia
+        self.multa = multa
