@@ -161,6 +161,29 @@ def test_arquivo_retorno_total_pago():
     assert resultado == Decimal("154.20")
 
 
+def test_repetir_leitura_nao_duplica_titulos_nem_total_pago():
+    arquivo = ArquivoRetornoBMP(criar_arquivo())
+    arquivo.ler()
+
+    resultado = arquivo.ler()
+
+    assert len(resultado) == 2
+    assert len(arquivo.pagos()) == 1
+    assert arquivo.total_pago() == Decimal("154.20")
+
+
+def test_reler_texto_sem_titulos_limpa_os_titulos_anteriores():
+    arquivo = ArquivoRetornoBMP(criar_arquivo())
+    arquivo.ler()
+    arquivo.texto = criar_header() + "\r\n" + criar_trailer()
+
+    resultado = arquivo.ler()
+
+    assert resultado == []
+    assert arquivo.pagos() == []
+    assert arquivo.total_pago() == Decimal("0.00")
+
+
 def test_arquivo_retorno_recusa_remessa():
     linha_de_remessa = montar_linha([(1, "0"), (2, "1"), (3, "REMESSA")])
 
