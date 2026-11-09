@@ -6,6 +6,15 @@ from decimal import ROUND_HALF_UP
 # ex.: 150.70 * 100 em float da 15069.999... e o boleto sairia com 150,69
 def valor_cnab(valor, tamanho=13):
     valor_decimal = Decimal(str(valor)) #convertemos em decimal exato
+
+    # o campo monetario so aceita valores finitos e sem sinal negativo
+    # conferimos antes de arredondar para nao esconder um valor como -0.001
+    if not valor_decimal.is_finite():
+        raise Exception("Valor precisa ser finito")
+
+    if valor_decimal < 0:
+        raise Exception("Valor nao pode ser negativo")
+
     valor_centavos = valor_decimal * 100 #multiplicamos por 100 para transformar em centavos
     valor_arredondado = valor_centavos.quantize(Decimal("1"), rounding=ROUND_HALF_UP) #tira as casas que sobraram
     valor_inteiro = int(valor_arredondado) #transforma em inteiro
