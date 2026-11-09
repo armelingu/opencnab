@@ -36,6 +36,11 @@ título ou comando e o trailer. Cada registro concatena os campos na ordem do
 layout, usando `campos.append` e comentários com as posições do manual.
 O resultado é um texto com linhas de 400 posições separadas por CRLF.
 
+Na entrada de um título Itaú com `MultaItau`, um `RegistroMultaItau` tipo 2
+é incluído logo após seu detalhe tipo 1. O registro tem sequencial próprio
+e o trailer considera essa linha adicional. Sem multa, a estrutura anterior
+é preservada.
+
 `salvar(caminho)` gera esse texto e grava em ASCII, preservando o CRLF.
 As funções do núcleo removem acentos, preenchem espaços e zeros e formatam
 datas e valores antes da montagem dos registros.

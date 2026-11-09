@@ -299,6 +299,42 @@ protestar dois dias corridos após o vencimento; e um comando só é aceito ante
 de o protesto começar — se já estiver em andamento, suste primeiro e comande
 depois, o que pode ir no mesmo arquivo.
 
+### Multa na entrada de títulos do Itaú
+
+Para informar multa em um título novo, preencha `multa` com `MultaItau`.
+O registro complementar tipo 2 é gravado logo após o detalhe desse título:
+
+```python
+from datetime import date
+from opencnab import BoletoItauCobranca
+from opencnab import MultaItau
+
+boleto = BoletoItauCobranca(
+    numero_documento="NF001",
+    nosso_numero="12345678",
+    valor="1250.55",
+    vencimento=date(2026, 9, 15),
+    data_emissao=date(2026, 8, 10),
+    nome_pagador="CLIENTE DE EXEMPLO",
+    documento_pagador="123.456.789-01",
+    multa=MultaItau(codigo="2", data=date(2026, 9, 15), valor="2.00")
+)
+
+# adicione o boleto a uma ArquivoRemessaItau como nos exemplos anteriores
+```
+
+O código `1` informa multa em reais, `2` informa percentual e `0` indica que
+não deve registrar multa. Sem preencher `multa`, nenhum tipo 2 é gerado.
+A data é gravada em DDMMAAAA e deve ser maior ou igual ao vencimento;
+segundo o manual, a multa incide após essa data. O Itaú limita a 99 dias
+o prazo em relação ao vencimento quando recebe uma data mais distante.
+
+O valor em reais deve ser menor que o valor do título e o percentual deve
+ser menor que 100, inclusive depois do arredondamento para duas casas.
+Esta implementação aceita multa somente na entrada de títulos novos.
+A inclusão ou alteração em títulos já registrados, com ocorrência `49`,
+ainda não está implementada.
+
 ## Gerando o código de barras e a linha digitável
 
 O que o cliente enxerga no boleto: o código de barras que o caixa lê e a linha
@@ -445,9 +481,9 @@ Vale conhecer os limites atuais antes de colocar em produção:
   posições e é conferido posição a posição nos testes, mas ainda não foi validado
   contra um arquivo processado pelo banco de verdade. Faça um envio de teste
   antes de usar em produção.
-- No Itaú, o registro opcional de multa (tipo 2) e o de rateio de crédito
-  (tipo 4) ainda não são gerados. Multa percentual diferente da cadastrada na
-  conta depende desse registro.
+- No Itaú, o registro de multa (tipo 2) está disponível na entrada de títulos
+  novos. A alteração de multa com ocorrência `49` e o rateio de crédito
+  (tipo 4) ainda não estão implementados.
 
 ## Glossário rápido
 
