@@ -26,8 +26,10 @@ da entrega correspondente em `main` e de sua tag.
 
 ## Novas funcionalidades
 
-- [ ] Implementar o registro tipo 2 de multa do Itaú CNAB 400, conforme o
-  manual atual, com validações, posições e sequência dos registros testadas.
+- [x] Implementar o registro tipo 2 de multa na entrada de títulos do Itaú
+  CNAB 400, com validações, posições e sequência dos registros testadas.
+- [ ] Implementar inclusão e alteração de multa de títulos já registrados,
+  usando ocorrência 49 e os campos obrigatórios definidos na nota 6.
 - [ ] Ampliar os métodos de comando das remessas para as ocorrências já
   catalogadas, conferindo os campos exigidos por cada operação.
 - [ ] Adicionar outro banco em CNAB 400. Escolher o banco e reunir seu

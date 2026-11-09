@@ -4,6 +4,7 @@ from opencnab.nucleo.campos import numerico
 from opencnab.nucleo.campos import zeros
 from opencnab.nucleo.datas import data_ou_zeros
 from opencnab.nucleo.valores import valor_cnab
+from opencnab.nucleo.valores import valor_de_cnab
 from opencnab.nucleo.validacoes import somente_numeros
 from opencnab.nucleo.validacoes import tipo_inscricao
 from opencnab.nucleo.validacoes import tipo_inscricao_ou_zeros
@@ -12,6 +13,66 @@ from opencnab.bancos.itau.cnab_400 import instrucoes
 from opencnab.bancos.itau.cnab_400 import ocorrencias
 
 CODIGO_BANCO = "341"
+
+
+# manual de setembro de 2026, paginas 23 e 24 e notas 35 a 37
+# a primeira entrega aceita multa na entrada; alteracao usa a ocorrencia 49
+def validar_multa(boleto):
+    if boleto.ocorrencia != ocorrencias.ENTRADA:
+        raise Exception("Multa disponivel somente na entrada de titulo novo")
+
+    codigo = str(boleto.multa.codigo)
+
+    if codigo not in ["0", "1", "2"]:
+        raise Exception("Codigo da multa precisa ser 0, 1 ou 2")
+
+    if boleto.multa.data is None:
+        raise Exception("Multa precisa de data")
+
+    if boleto.vencimento is None:
+        raise Exception("Multa precisa do vencimento do titulo")
+
+    if boleto.multa.data < boleto.vencimento:
+        raise Exception("Data da multa nao pode ser anterior ao vencimento")
+
+    # conferimos o valor que sera gravado, inclusive depois do arredondamento
+    valor_multa = valor_de_cnab(valor_cnab(boleto.multa.valor))
+
+    if codigo == "1":
+        valor_titulo = valor_de_cnab(valor_cnab(boleto.valor))
+
+        if valor_multa >= valor_titulo:
+            raise Exception("Multa em reais precisa ser menor que o valor do titulo")
+
+    if codigo == "2" and valor_multa >= 100:
+        raise Exception("Percentual da multa precisa ser menor que 100")
+
+
+# o registro tipo 2 complementa o tipo 1 e tem seu proprio sequencial
+class RegistroMultaItau:
+
+    def __init__(self, boleto, sequencial_registro):
+        self.boleto = boleto
+        self.sequencial_registro = sequencial_registro
+
+    def gerar(self):
+        validar_multa(self.boleto)
+
+        campos = []
+
+        campos.append(numerico("2", 1))                          #001-001 identificacao do registro
+        campos.append(numerico(self.boleto.multa.codigo, 1))      #002-002 codigo da multa
+        campos.append(self.boleto.multa.data.strftime("%d%m%Y")) #003-010 data da multa em DDMMAAAA
+        campos.append(valor_cnab(self.boleto.multa.valor))        #011-023 valor em reais ou percentual
+        campos.append(branco(371))                               #024-394 complemento de registro
+        campos.append(numerico(self.sequencial_registro, 6))     #395-400 sequencial do registro
+
+        linha = "".join(campos)
+
+        if len(linha) != 400:
+            raise Exception("Registro de multa do Itau saiu com " + str(len(linha)) + " posicoes em vez de 400")
+
+        return linha
 
 
 # confere o que o banco rejeitaria ou entenderia errado

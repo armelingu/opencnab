@@ -51,8 +51,12 @@ de ocorrências do Itaú.
 `BoletoItau` monta o campo livre, o código de barras e a linha digitável,
 calculando os dígitos de agência com conta e do nosso número.
 
-Os registros opcionais de multa tipo 2 e rateio de crédito tipo 4 ainda
-não são gerados. A implementação tem testes de posições e um ciclo de
+O registro opcional de multa tipo 2 é gerado na entrada de títulos novos
+quando `BoletoItauCobranca.multa` recebe `MultaItau`. Aceita código 0 (não
+registrar), 1 (reais) e 2 (percentual), com data em DDMMAAAA e validações
+das notas 35 a 37 do manual de setembro de 2026. A alteração de multa com
+ocorrência 49 e o rateio de crédito tipo 4 ainda não estão implementados.
+A implementação tem testes de posições e um ciclo de
 remessa e retorno simulado, mas isso não substitui a homologação com o banco.
 
 Os manuais CNAB 400 e CNAB 240 de setembro de 2026, fornecidos para a

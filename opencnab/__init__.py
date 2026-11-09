@@ -12,6 +12,7 @@ from opencnab.bancos.itau.cnab_400 import instrucoes as instrucoes_itau
 from opencnab.bancos.itau.cnab_400 import ocorrencias as ocorrencias_itau
 from opencnab.bancos.itau.cnab_400.modelos import BoletoItauCobranca
 from opencnab.bancos.itau.cnab_400.modelos import EnderecoPagador
+from opencnab.bancos.itau.cnab_400.modelos import MultaItau
 from opencnab.bancos.itau.cnab_400.remessa import ArquivoRemessaItau
 from opencnab.bancos.itau.cnab_400.retorno import ArquivoRetornoItau
 from opencnab.bancos.itau.cnab_400.retorno import ler_arquivo_retorno as ler_retorno_itau
@@ -30,6 +31,7 @@ __all__ = [
     "ocorrencias_itau",
     "BoletoItauCobranca",
     "EnderecoPagador",
+    "MultaItau",
     "ArquivoRemessaItau",
     "ArquivoRetornoItau",
     "ler_retorno_itau",
