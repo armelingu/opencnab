@@ -5,6 +5,7 @@ from opencnab.nucleo.campos import zeros
 from opencnab.nucleo.datas import data_cnab
 from opencnab.bancos.itau.boleto import calcular_dac_conta
 from opencnab.bancos.itau.cnab_400.registros import RegistroTipo1Itau
+from opencnab.bancos.itau.cnab_400.registros import RegistroMultaItau
 from opencnab.bancos.itau.cnab_400.modelos import BoletoItauCobranca
 from opencnab.bancos.itau.cnab_400 import ocorrencias
 
@@ -191,6 +192,11 @@ class ArquivoRemessaItau:
             sequencial = sequencial + 1
             registro = RegistroTipo1Itau(self.agencia, self.conta, self.carteira, self.documento_empresa, boleto, sequencial)
             linhas.append(registro.gerar())
+
+            if boleto.multa is not None:
+                sequencial = sequencial + 1
+                multa = RegistroMultaItau(boleto, sequencial)
+                linhas.append(multa.gerar())
 
         sequencial = sequencial + 1
         trailer = TrailerRemessaItau(sequencial)
