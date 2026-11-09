@@ -400,6 +400,10 @@ precisa montar o campo livre das 25 posições conforme o manual do seu banco.
 
 ## Testes
 
+A documentação técnica está em [arquitetura](docs/arquitetura.md),
+[bancos suportados](docs/bancos_suportados.md), [roadmap](docs/roadmap.md)
+e [fluxo de desenvolvimento](docs/desenvolvimento.md).
+
 ```bash
 pytest
 ```
