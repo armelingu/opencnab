@@ -43,7 +43,9 @@ class HeaderRemessaItau:
         campos.append(alfa(NOME_BANCO, 15))              #080-094 nome do banco
         campos.append(data_cnab(self.data_geracao))      #095-100 data de geracao do arquivo
         campos.append(branco(294))                       #101-394 complemento de registro
-        campos.append(numerico(self.sequencial_remessa, 6)) #395-400 sequencial do registro
+        # o manual de setembro de 2026 (pagina 21) fixa o header em 000001
+        # sequencial_remessa continua na API para manter a compatibilidade
+        campos.append(numerico("1", 6))                  #395-400 sequencial do registro
 
         linha = "".join(campos)
 

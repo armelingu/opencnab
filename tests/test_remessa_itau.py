@@ -67,6 +67,12 @@ def test_header_traz_o_banco_itau():
     assert resultado[79:94] == "BANCO ITAU SA  "
 
 
+def test_header_sempre_comeca_com_sequencial_um():
+    resultado = HeaderRemessaItau(AGENCIA, CONTA, "MINHA EMPRESA LTDA", date(2026, 8, 10), 42).gerar()
+
+    assert resultado[394:400] == "000001"
+
+
 def test_header_traz_a_data_de_geracao():
     resultado = HeaderRemessaItau(AGENCIA, CONTA, "MINHA EMPRESA LTDA", date(2026, 8, 10), 1).gerar()
     assert resultado[94:100] == "100826"
@@ -172,6 +178,19 @@ def test_arquivo_numera_os_registros_em_sequencia():
     assert resultado[0][394:400] == "000001"
     assert resultado[1][394:400] == "000002"
     assert resultado[2][394:400] == "000003"
+
+
+def test_numero_da_remessa_nao_muda_a_sequencia_dos_registros():
+    arquivo = criar_arquivo()
+    arquivo.sequencial_remessa = 42
+    arquivo.adicionar_boleto(criar_boleto())
+
+    resultado = arquivo.gerar().split("\r\n")
+
+    assert resultado[0][394:400] == "000001"
+    assert resultado[1][394:400] == "000002"
+    assert resultado[2][394:400] == "000003"
+    assert resultado[3][394:400] == "000004"
 
 
 def test_arquivo_com_dois_boletos_numera_certo():
