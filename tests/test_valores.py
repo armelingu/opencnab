@@ -89,3 +89,23 @@ def test_valor_de_cnab_sem_digitos():
 
     assert mensagem == "Valor CNAB sem digitos"
 
+
+def test_valor_cnab_no_limite_de_treze_posicoes():
+    resultado = valor_cnab("99999999999.99")
+    assert resultado == "9999999999999"
+
+
+def test_valor_cnab_maior_que_treze_posicoes_da_erro():
+    resultado = mensagem_de_erro("100000000000.00")
+    assert resultado == "Valor muito grande"
+
+
+def test_valor_cnab_arredondamento_passa_do_limite():
+    resultado = mensagem_de_erro("99999999999.995")
+    assert resultado == "Valor muito grande"
+
+
+def test_valor_cnab_no_limite_do_codigo_de_barras():
+    resultado = valor_cnab("99999999.99", 10)
+    assert resultado == "9999999999"
+

@@ -26,3 +26,36 @@ def test_data_de_cnab_tamanho_errado():
         mensagem = str(erro)
 
     assert mensagem == "Data CNAB precisa ter 6 posicoes"
+
+
+def test_data_de_cnab_ano_bissexto():
+    resultado = data_de_cnab("290224")
+    assert resultado == date(2024, 2, 29)
+
+
+def test_data_de_cnab_limites_do_ano_com_dois_digitos():
+    assert data_de_cnab("010100") == date(2000, 1, 1)
+    assert data_de_cnab("311299") == date(2099, 12, 31)
+
+
+def test_data_de_cnab_recusa_datas_inexistentes():
+    for texto in ["290223", "310426", "000126", "011326"]:
+        deu_erro = False
+
+        try:
+            data_de_cnab(texto)
+        except ValueError:
+            deu_erro = True
+
+        assert deu_erro is True
+
+
+def test_data_de_cnab_recusa_texto_sem_digitos():
+    deu_erro = False
+
+    try:
+        data_de_cnab("abcdef")
+    except ValueError:
+        deu_erro = True
+
+    assert deu_erro is True

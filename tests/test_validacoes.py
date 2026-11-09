@@ -30,3 +30,15 @@ def test_tipo_inscricao_documento_invalido():
         mensagem = str(erro)
 
     assert mensagem == "Documento precisa ter 11 digitos para CPF ou 14 para CNPJ"
+
+
+def test_tipo_inscricao_recusa_tamanhos_vizinhos_de_cpf_e_cnpj():
+    for documento in ["1" * 10, "1" * 12, "1" * 13, "1" * 15, ""]:
+        mensagem = ""
+
+        try:
+            tipo_inscricao(documento)
+        except Exception as erro:
+            mensagem = str(erro)
+
+        assert mensagem == "Documento precisa ter 11 digitos para CPF ou 14 para CNPJ"
