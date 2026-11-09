@@ -54,3 +54,49 @@ def test_branco():
 def test_zeros():
     resultado = zeros(4)
     assert resultado == "0000"
+
+
+def test_numerico_no_tamanho_maximo():
+    resultado = numerico("99999", 5)
+    assert resultado == "99999"
+
+
+def test_numerico_maior_que_o_campo_da_erro():
+    mensagem = ""
+
+    try:
+        numerico("100000", 5)
+    except Exception as erro:
+        mensagem = str(erro)
+
+    assert mensagem == "Valor muito grande"
+
+
+def test_numerico_confere_tamanho_depois_de_tirar_a_pontuacao():
+    resultado = numerico("12.345", 5)
+    assert resultado == "12345"
+
+
+def test_numerico_vazio_vai_zerado():
+    resultado = numerico("", 5)
+    assert resultado == "00000"
+
+
+def test_alfa_no_tamanho_maximo():
+    resultado = alfa("ABCDE", 5)
+    assert resultado == "ABCDE"
+
+
+def test_alfa_corta_o_que_passa_do_campo():
+    resultado = alfa("ABCDEF", 5)
+    assert resultado == "ABCDE"
+
+
+def test_alfa_vazio_vai_em_branco():
+    resultado = alfa("", 5)
+    assert resultado == "     "
+
+
+def test_alfa_normaliza_antes_de_cortar():
+    resultado = alfa("ação extra", 4)
+    assert resultado == "ACAO"
