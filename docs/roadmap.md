@@ -40,7 +40,7 @@ da entrega correspondente em `main` e de sua tag.
 - [x] Descrever a arquitetura e o caminho dos dados na geração e na leitura.
 - [x] Documentar os bancos suportados, funcionalidades e limites atuais.
 - [x] Organizar o roadmap por tipo de entrega.
-- [ ] Preencher os exemplos executáveis de geração de remessa e leitura de
+- [x] Preencher os exemplos executáveis de geração de remessa e leitura de
   retorno, usando dados fictícios e instruções de execução.
 
 ## Automação

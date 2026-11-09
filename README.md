@@ -404,6 +404,9 @@ A documentação técnica está em [arquitetura](docs/arquitetura.md),
 [bancos suportados](docs/bancos_suportados.md), [roadmap](docs/roadmap.md)
 e [fluxo de desenvolvimento](docs/desenvolvimento.md).
 
+Há também [exemplos executáveis de remessa e retorno BMP](tests/exemplos/README.md),
+com dados fictícios na geração e instruções para ler o retorno recebido do banco.
+
 ```bash
 pytest
 ```
